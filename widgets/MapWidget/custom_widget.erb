@@ -1,14 +1,20 @@
 <%-# Last modified: 07/13/2015 by greenertux (Tristan Hoffmann) -%>
 
+<% #Change variables: 
+entityName = 'your-entity'
+locationLat = 'your field name containing latitude'
+locationLon = 'your field name containing longitude'
+%>
+
 <script src="query-jvectormap-1.2.2.min.js"></script>
 <script src="jquery-jvectormap-world-mill-en.js"></script>
 
 <script>
-var JSON = <%= entity_type('your-entity').requesting(9999999).to_json.html_safe %>
+var JSON = <%= entity_type(entityName).requesting(9999999).to_json.html_safe %>
 var markers = [];
 for (index = 0; index < JSON.length; ++index) {
   if (!JSON[index].properties.LocationLat) continue;
-  markers.push({latLng: [JSON[index].properties.LocationLat, JSON[index].properties.LocationLon], name: JSON[index].properties.title});
+  markers.push({latLng: [JSON[index].properties.<%=locationLat.to_s%>, JSON[index].properties.<%=locationLon.to_s%>], name: JSON[index].properties.title});
   }
 var map = null;
 </script>

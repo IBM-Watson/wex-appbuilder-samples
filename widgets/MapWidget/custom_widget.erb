@@ -1,0 +1,94 @@
+<%-# Last modified: 07/13/2015 by greenertux (Tristan Hoffmann) -%>
+
+<% #Change variables: 
+entityName = 'your-entity'
+locationLat = 'your field name containing latitude'
+locationLon = 'your field name containing longitude'
+%>
+
+<script src="query-jvectormap-1.2.2.min.js"></script>
+<script src="jquery-jvectormap-world-mill-en.js"></script>
+
+<script>
+var JSON = <%= entity_type(entityName).requesting(9999999).to_json.html_safe %>
+var markers = [];
+for (index = 0; index < JSON.length; ++index) {
+  if (!JSON[index].properties.LocationLat) continue;
+  markers.push({latLng: [JSON[index].properties.<%=locationLat.to_s%>, JSON[index].properties.<%=locationLon.to_s%>], name: JSON[index].properties.title});
+  }
+var map = null;
+</script>
+<style>
+  .jvectormap-label {
+    position: absolute;
+    display: none;
+    border: solid 1px #CDCDCD;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: #292929;
+    color: white;
+    font-family: sans-serif, Verdana;
+    font-size: smaller;
+    padding: 3px;
+    z-index: 10000;
+}
+
+.jvectormap-zoomin, .jvectormap-zoomout {
+    position: absolute;
+    left: 10px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: #292929;
+    padding: 3px;
+    color: white;
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    line-height: 10px;
+    text-align: center;
+}
+
+.jvectormap-zoomin {
+    top: 10px;
+}
+
+.jvectormap-zoomout {
+    top: 30px;
+}
+</style>
+  <div id="world-map" style="width: 270px; height: 180px"></div>
+  <script>
+    $(function(){
+    map = new jvm.WorldMap({
+    container: $('#world-map'),
+    map: 'world_mill_en',
+    scaleColors: ['#FFFFFF', '#0071A4'],
+    regionStyle: {
+      initial: {
+        fill: '#336699',
+        "fill-opacity": 1,
+        stroke: 'none',
+        "stroke-width": 0,
+        "stroke-opacity": 1
+        },
+      hover: {
+        "fill-opacity": 0.8
+        },
+      selected: {fill: 'yellow'},
+      selectedHover: {}
+    },
+    normalizeFunction: 'polynomial',
+    hoverOpacity: 0.7,
+    hoverColor: false,
+    markerStyle: {
+      initial: {
+        fill: '#F8E23B',
+        stroke: '#000000'
+      }
+    },
+    backgroundColor: 'transparent'
+  });
+      map.addMarkers(markers);
+}); 

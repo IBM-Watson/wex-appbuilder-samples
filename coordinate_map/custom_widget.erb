@@ -56,10 +56,10 @@ var map = null;
     top: 30px;
 }
 </style>
-  <div id="world-map" style="width: 270px; height: 180px"></div>
-  <script>
-    $(function(){
-    map = new jvm.WorldMap({
+<div id="world-map" style="width: 270px; height: 180px"></div>
+<script>
+$(function(){
+  map = new jvm.WorldMap({
     container: $('#world-map'),
     map: 'world_mill_en',
     scaleColors: ['#FFFFFF', '#0071A4'],
@@ -88,5 +88,6 @@ var map = null;
     },
     backgroundColor: 'transparent'
   });
-      map.addMarkers(markers);
+  map.addMarkers(markers);
 });
+</script>

@@ -19,11 +19,6 @@ the count of loans each lender issued to each borrower.  The image hover
 shows that Barclays is borrowing from several banks
 (multi colored ribbons) and lending to several other banks (orange ribbons).
 
-The code example below requires internet access for the CDN (Content
+The code example in [chord_diagram.erb](chord_diagram.erb) requires internet access for the CDN (Content
 Delivery Network). In production use, this javascript code should be
 referenced locally.
-
-# Example Code
-
-```
-```

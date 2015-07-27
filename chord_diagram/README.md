@@ -1,8 +1,6 @@
-# Name
+# Chord diagram #
 
-Chord diagram custom widget
-
-# Description and Use
+# Description and Use #
 
 Chord diagrams (also known as Dependency wheels) are commonly used for
 showing entity relationships between small groups of entities. These

@@ -1,0 +1,75 @@
+<div id="taWidgetContainer" class="TAresult"></div>
+
+<%
+books = entity_types('Book Title').requesting(100)
+
+endpoint = "/proxy/ta/";
+subject = "Book"; 
+
+columns = Array.new
+columns << { :key => "size", :type => "numeric", :is_objective => true, :goal => "min", :full_name => "Size" }
+columns << { :key => "year", :type => "numeric", :is_objective => true, :goal => "max", :full_name => "Year" }
+columns << { :key=> "sales_2011", :type=> "numeric", :is_objective=> true, :goal=> "min", :full_name=> "Sales_2011" }
+columns << { :key => "sales_2010", :type => "numeric", :is_objective => true, :goal => "min", :full_name => "Sales_2010" }
+
+model = Array.new
+
+fields_to_get = ["sales_2011", "sales_2010", "year", "size"]
+key = 0;
+
+books.each do |book|
+  values = Hash.new
+  
+  fields_to_get.each do |field|
+    count = book[field].first
+    if count.nil? || count.empty?
+      count = 0
+    else
+      count = count.sub("$", "")
+    end
+    
+    values[field] = count.to_i
+  end
+  
+  model << { :key => key, :name => book['title'].first, :values => values }
+  key += 1
+end
+  
+%>
+
+<script>
+   
+  var ta_model = <%= model.to_json.html_safe %>;
+  var columns = <%= columns.to_json.html_safe %>;
+   
+  console.log(ta_model);
+  
+  var problem = {
+    "subject": "<%= subject %>",
+    "columns": columns,
+    "options": ta_model
+  };
+  
+  // console.log(problem);
+
+  $(document).ready(function() {
+    var taClient = new TradeoffAnalytics({
+      dilemmaServiceUrl: "<%= endpoint %>",
+      iframe: false,
+      errCallback: function() {
+        console.log("we've got error.");
+      },
+    }, 'taWidgetContainer');
+
+    taClient.start(function() {
+      console.log("we are done with initialization");
+      taClient.resize(800, 500);     
+      taClient.show(problem, function() {
+        console.log("we've got answer");
+      });
+    });
+});
+</script>
+
+
+<script type="text/javascript" src="https://ta-cdn.mybluemix.net/v1/TradeoffAnalytics.js"></script>

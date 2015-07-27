@@ -1,0 +1,93 @@
+<div id="chart_loans_chord_chart">This Is Where The Chart Goes</div>
+
+<div>
+  Showing count of loans between lenders and borrowers for top 10 loans lent by <%= @subject["name"].first %>
+</div>
+
+<%!-- These are the CDN includes --%>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js"></script>
+<script type="text/javascript" src="http://redotheweb.com/DependencyWheel/js/d3.dependencyWheel.js"></script>
+
+<%
+
+def get_lender(for_company, interesting_companies=nil)
+  results = entity_type("Lender").where(field('lender_parent').contains(for_company)).requesting(15)
+
+  facet_id = "lender_name_facet"
+  name_facet = field('lender_parent').with_facet_id(facet_id).without_pruning
+
+  lenders = Hash.new
+
+  results.each do |lender|
+    joint_lenders = lender.loan_agreement.requesting(1).first.lenders.faceted_by(name_facet).faceting
+
+    joint_lenders.get_facet(facet_id).facet_values.each do |joint_lender|
+      lender_name = joint_lender.label.downcase
+
+      if lenders.key? lender_name
+        lenders[lender_name] += 1
+      else
+        lenders[lender_name] = 0
+      end
+    end
+  end
+
+  lenders
+
+end
+
+loans = Hash.new
+
+company_name = @subject['name'].first
+
+loans[company_name] = get_lender(company_name)
+companies = loans[company_name].keys.map(&:downcase).uniq
+
+companies.each do |joint_company|
+  loans[joint_company] = get_lender(joint_company, companies)
+end
+
+# create the relationship dependency matrix
+
+matrix = []
+companies.each do |from|
+  row = []
+
+  companies.each do |to|
+    if from == to
+      row << 0
+    elsif loans[from].key? to
+      row << loans[from][to]
+    else
+      row << 0
+    end
+  end
+
+  matrix << row
+
+end
+%>
+
+<script>
+ var data = {
+     packageNames: <%= companies.to_json.html_safe %>, matrix:  <%= matrix.to_json.html_safe %>
+ };
+</script>
+
+
+<script>
+
+  var test_data = {
+    packageNames: ['Main', 'A', 'B'],
+      matrix: [[0, 1, 1], // Main depends on A and B
+               [0, 0, 1], // A depends on B
+               [0, 0, 0]] // B doesn't depend on A or Main
+  };
+
+
+  var chart = d3.chart.dependencyWheel();
+  d3.select('#chart_loans_chord_chart')
+    .datum(data)
+    .call(chart);
+
+</script>

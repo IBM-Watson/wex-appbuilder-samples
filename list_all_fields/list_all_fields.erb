@@ -1,0 +1,23 @@
+<style>
+ .field {
+   padding: 0.5em;
+ }
+ div.fields div.field:nth-of-type(odd) {
+   background-color: lightgrey;
+ }
+
+  div.fieldname {
+    font-weight: bold;
+    font-size: large;
+    margin-bottom: 0.5em;
+  }
+  
+</style>
+<div class="fields">
+<% @subject.field_names.each do |name| %>
+  <div class="field">
+    <div class="fieldname"><%= name %></div>
+    <div class="fieldvalue"><pre><%= @subject[name].uniq.join(", ") %></pre></div>
+</div>
+<% end %>
+</div>

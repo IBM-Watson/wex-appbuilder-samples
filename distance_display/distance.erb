@@ -1,0 +1,49 @@
+<% how_many_to_show = 5 %>
+<% output_format = :miles # options are :feet, :miles, :meters, :kilometers, :rods %>
+<% near_or_far = :near # could also be :far %>
+
+<%
+def haversineDistance(lat1,lng1,lat2,lng2)
+	radius = 6371000 # Radius of the Earth in m
+	Math.acos(Math.cos(lat1) * Math.cos(lng1) * Math.cos(lat2) * Math.cos(lng2) + Math.cos(lat1) * Math.sin(lng1) * Math.cos(lat2) * Math.sin(lng2) + Math.sin(lat1) * Math.sin(lat2)) * radius
+end
+
+def distance_format_helper(distval, format)
+	{:feet => lambda { |x| sprintf "%.0f ft", ceil(x / 0.3048) },
+	 :miles => lambda { |x| sprintf "%.1f mi", x * 0.000621371 },
+	 :meters => lambda { |x| sprintf "%.0f m", ceil(x) },
+	 :kilometers => lambda { |x| sprintf "%.3f km", x / 1000 },
+	 :rods => lambda { |x| sprintf "%.0f rods", x * 0.198838782 }}[format].call(distval)
+end
+%>
+
+<style>
+  div.distancebox {
+   padding: 0.5em;
+  }
+</style>
+
+<div>
+  <% unsorted_countries = [] %>
+  <% entity_types('Countries').requesting(50).each do |country|
+	lat1 = country['latitude'].first.to_f * (Math::PI / 180)
+	lng1 = country['longitude'].first.to_f * (Math::PI / 180)
+	lat2 = @subject['latitude'].first.to_f * (Math::PI / 180)
+	lng2 = @subject['longitude'].first.to_f * (Math::PI / 180)
+	
+	distance = haversineDistance(lat1, lng1, lat2, lng2)
+	if (distance > 1) # we don't want to include the @subject here
+	  unsorted_countries << {:entity => country, :title => country.title, :distance => distance}
+	end
+     end
+  %>
+
+  <% sorted_countries = unsorted_countries.sort_by { |x| x[:distance] } %>
+  <% sorted_countries.reverse! unless near_or_far == :near %>
+  <% sorted_countries.take(how_many_to_show).each do |country| %>
+  <div class="distancebox">
+   <div class="country_name"><%= entity_link_to country[:title], country[:entity] %> </div>
+   <div class="country_distance">Distance: <%= distance_format_helper(country[:distance],output_format) %></div>
+  </div>
+  <% end %>
+</div>

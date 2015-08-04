@@ -1,0 +1,59 @@
+<script src="http://momentjs.com/downloads/moment-with-locales.min.js"></script>
+<script src="http://momentjs.com/downloads/moment-timezone-with-data-2010-2020.min.js"></script>
+
+<script>
+function worldClock() {
+	var now = moment();
+  	$(".clock").each(function() {
+		var timezone = $(this).data('tz');
+		var tz_now = now.tz(timezone);  
+		$(this).html("<div class='date'>"+tz_now.format('MMMM Do YYYY')+"</div>");
+		$(this).append("<div class='time'>"+tz_now.format('h:mm:ss a')+"</div>");
+		$(this).append("<div class='timezone'>"+timezone+"</div>");
+	});
+	setTimeout("worldClock()", 1000)
+}
+
+$(function() {
+	worldClock();
+});
+</script>
+
+<style>
+	.clock {
+	float: left;
+	padding: 1em;
+	text-align: center;
+	}
+
+	.time {
+	font-size:1.4em;
+	color:#005288;
+	padding: 4px 0;
+	}
+
+	.timezone {
+	font-size:1.1em;
+	font-weight: 500;
+	}
+
+</style>
+
+<div class="worldclock">
+	<div data-tz="GMT" class="clock">
+	</div>
+
+	<div data-tz="Asia/Singapore" class="clock">
+	</div>
+
+	<div data-tz="America/New_York" class="clock">
+
+	</div>
+</div>
+
+
+
+
+
+
+

@@ -55,7 +55,6 @@ end
   $(document).ready(function() {
     var taClient = new TradeoffAnalytics({
       dilemmaServiceUrl: "<%= endpoint %>",
-      iframe: false,
       errCallback: function() {
         console.log("we've got error.");
       },
@@ -63,6 +62,7 @@ end
 
     taClient.start(function() {
       console.log("we are done with initialization");
+      // The size of the Tradeoff Analytics visualization could be changed here
       taClient.resize(800, 500);     
       taClient.show(problem, function() {
         console.log("we've got answer");

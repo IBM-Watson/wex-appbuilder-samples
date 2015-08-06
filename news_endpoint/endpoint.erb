@@ -1,0 +1,15 @@
+Struct.new("NewsLink",:link,:title)
+
+def cleanlyEncode(stringval)
+  utf8 = Encoding.find('UTF-8')
+  options = {invalid: :replace,
+               undef: :replace,
+             replace: ''}
+  stringval.encode(utf8, options)
+end
+
+response = HttpClient.request("https://news.ycombinator.com").body
+n = Nokogiri::HTML.parse(response)
+n.xpath('//td[@class="title"]/a').map { |x|
+  Struct::NewsLink.new(x.attributes['href'].to_s, cleanlyEncode(x.text.to_s))
+}[0..-2]

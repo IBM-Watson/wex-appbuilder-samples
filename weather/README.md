@@ -2,13 +2,11 @@
 
 # Description and Use #
 
-This is a simple weather widget that does not rely on an endpoint.  See the widget `weather_endpoint`
-for a version of this widget that uses an endpoint.
-
-The widget relies on a div having class `weather` with a `data` attribute for `zip`.  This data attribute should be set
-to the zipcode of the target location.  You may have more than one weather displayed by adding another div with the class and data
-attributes set.
+This simple weather widget does not require an endpoint. The widget relies on a `.weather` div
+having a `data-zip` attribute.  The data attribute must be set
+to the zipcode of the target location.  You may display more than one weather block, however an api
+call will be made for each location which can impact load times.  
 
 ![Screenshot](weather_screenshot.png)
 
-This wigdet gets the weather via a YQL query to the Yahoo! Weather API.
+This widget gets the weather via a YQL query to the Yahoo! Weather API.

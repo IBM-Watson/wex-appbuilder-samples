@@ -1,5 +1,14 @@
+# First, we set up a struct to handle
+# the headlines and their links.  This struct
+# is used instead of a hash to more formalize the parameters.
 Struct.new("NewsLink",:link,:title)
 
+# cleanlyEncode forces the encoding
+# of strings to UTF-8 and replaces any
+# invalid or undefined characters that may be found.
+# This was added because the test site, news.ycombinator.com
+# sometimes includes strangely encoded strings that are not
+# compatible with erb/ruby rendering.
 def cleanlyEncode(stringval)
   utf8 = Encoding.find('UTF-8')
   options = {invalid: :replace,
@@ -8,8 +17,20 @@ def cleanlyEncode(stringval)
   stringval.encode(utf8, options)
 end
 
+# Use the Application Builder class, HttpClient
+# to do the actual fetching.  This class wraps the Excon gem
+# and provides a simple interface for GETing a url
 response = HttpClient.request("https://news.ycombinator.com").body
-n = Nokogiri::HTML.parse(response)
-n.xpath('//td[@class="title"]/a').map { |x|
-  Struct::NewsLink.new(x.attributes['href'].to_s, cleanlyEncode(x.text.to_s))
+
+# setup the parsed response from the client.
+parsed_response = Nokogiri::HTML.parse(response)
+
+# The xpath here was created by inspecting the web site
+# and finding the markup used for the parts of the site
+# we wanted to scrape.  We exclude the last link on the page
+# because it is a 'More' link that doesn't do much for our purposes.
+parsed_response.xpath('//td[@class="title"]/a').map { |news_result|
+  link = news_result.attributes['href'].to_s
+  title_clean = cleanlyEncode(news_result.to_s)
+  Struct::NewsLink.new(link,title)
 }[0..-2]

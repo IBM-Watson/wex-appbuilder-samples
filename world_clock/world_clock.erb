@@ -1,4 +1,5 @@
 <script src="http://momentjs.com/downloads/moment-with-locales.min.js"></script>
+<%# this code will stop working in 2020 %>
 <script src="http://momentjs.com/downloads/moment-timezone-with-data-2010-2020.min.js"></script>
 
 <script>
@@ -6,10 +7,15 @@ function worldClock() {
 	var now = moment();
   	$(".clock").each(function() {
 		var timezone = $(this).data('tz');
-		var tz_now = now.tz(timezone);  
-		$(this).html("<div class='date'>"+tz_now.format('MMMM Do YYYY')+"</div>");
-		$(this).append("<div class='time'>"+tz_now.format('h:mm:ss a')+"</div>");
-		$(this).append("<div class='timezone'>"+timezone+"</div>");
+        <%# we check the timezone to make sure it's valid %>
+		if (moment.tz.zone(timezone)) {
+			var tz_now = now.tz(timezone);
+			$(this).html("<div class='date'>"+tz_now.format('MMMM Do YYYY')+"</div>");
+			$(this).append("<div class='time'>"+tz_now.format('h:mm:ss a')+"</div>");
+			$(this).append("<div class='timezone'>"+timezone+"</div>");
+		} else {
+			$(this).html("Unrecognized time zone "+timezone);
+		}
 	});
 	setTimeout("worldClock()", 1000)
 }
@@ -36,10 +42,12 @@ $(function() {
 	font-size:1.1em;
 	font-weight: 500;
 	}
-
 </style>
 
 <div class="worldclock">
+  <%# Some other time zones:  America/St_Johns Antarctica/Vostok Asia/Almaty Asia/Istanbul Asia/Novosibirsk %>
+  <%#              Asia/Samarkand Australia/Adelaide Australia/Adelaide Etc/GMT+9 Europe/Vilnius Asia/Ho_Chi_Minh %>
+  <%# this is not an exhaustive list, you also can use Etc/GMT+n or Etc/GMT-n where n is an offset. %>
 	<div data-tz="GMT" class="clock">
 	</div>
 
@@ -47,7 +55,6 @@ $(function() {
 	</div>
 
 	<div data-tz="America/New_York" class="clock">
-
 	</div>
 </div>
 

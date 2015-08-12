@@ -1,0 +1,7 @@
+<ul>
+  <%# We call the endpoint we created in endpoint.erb %>
+  <%# If you get an error, make sure the name here matches the endpoint name %>
+<% endpoint("HackerNewsHeadlines").each do |headline| %>
+  <li><a href="<%= headline.link %>" title="<%= headline.title %>"><%= truncate(headline.title,length: 25) %></a><li>
+<% end %>
+</ul>

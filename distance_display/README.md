@@ -15,9 +15,9 @@ this repository.
 
 There are three user-adjustable parameters in the widget.  The first,
 `how_many_to_show` sets the number of countries shown in the widget.
-The second, `output_format` defines the distance output format.  This
+The second, `output_format`, defines the distance output format.  This
 can be in miles, feet, meters, kilometers, or rods.  The last
-parameter, `near_or_far` tells the widget to sort by nearest or most
+parameter, `near_or_far`, tells the widget to sort by nearest or most
 distant.
 
 The code uses the

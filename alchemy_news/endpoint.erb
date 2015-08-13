@@ -1,0 +1,64 @@
+# get the company name from the params
+company_name=params[:company_name]
+
+# Your api key, register for one http://www.alchemyapi.com/api/register.html
+# this code will not work without a valid key
+api_key = "API_KEY_HERE"
+
+# we want to go back 7 days
+start_date = 7.days.ago.to_time.to_i
+# and we want news up until right now
+end_date = Date.today.to_time.to_i
+
+# this url is the base url for the api 
+base_url = "https://access.alchemyapi.com/calls/data/GetNews"
+
+# most of these keys are documented in the Alchemy API docs.
+# http://docs.alchemyapi.com/docs/getting-started-1
+# We are getting the sentiment, url, publication date, and the title.
+# This query is only looking for Company names as entities in the story
+# and only in technology and computing news sources
+# it will return 25 results maximum in JSON
+options = { "apikey" => api_key,
+            "return" => "enriched.url.title,enriched.url.url,enriched.url.publicationDate,enriched.url.docSentiment",
+            "start" => start_date,
+            "end" => end_date,
+            "q.enriched.url.entities.entity"=>"|text=#{company_name},type=company|",
+            "q.enriched.url.taxonomy.taxonomy_.label" => "technology and computing",
+            "count" => 25,
+            "outputMode" => "json" }
+
+# this is a toy function
+# to convert the floating point score into a bucketed
+# rank value.  This information is used for the font/color
+# display in the widget
+def rank(scoreval)
+  if scoreval < 0
+    :negative
+  elsif scoreval == 0
+    :neutral
+  elsif scoreval < 0.1
+    :neg_neutral
+  elsif scoreval < 0.5
+    :pos_neutral
+  elsif scoreval < 0.8
+    :positive
+  elsif scoreval < 1
+    :propoganda
+  else
+    :unknown
+  end
+end
+
+# This is using the HttpClient class from AppBuilder
+results = JSON.parse(HttpClient.request(base_url, :query => options).body)
+
+# We build a struct to take the data and simplify access to it form the widget.
+Struct.new("AlchemyNewsLink",:sentimentscore,:sentiment_rank, :title, :url)
+
+results["result"]["docs"].map do |news_item|
+  base_data = news_item["source"]["enriched"]["url"]
+  score = base_data["docSentiment"]["score"]
+  sentiment_rank = rank(score)
+  Struct::AlchemyNewsLink.new(score, sentiment_rank,base_data["title"],base_data["url"])
+end

@@ -10,5 +10,5 @@ div.
 The code requires the ![moment.js](http://momentjs.com/) library (because
 otherwise time code in JavaScript is a huge pain).
 
-[Screen Shot](worldclock.png)
+![Screen Shot](worldclock.png)
 

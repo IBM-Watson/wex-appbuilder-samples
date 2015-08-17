@@ -1,0 +1,43 @@
+<ul>
+<% endpoint("NewsAlchemyAPI", company_name: "IBM").each do |news_item| %>
+<li class="alchemy <%= news_item.sentiment_rank.to_s %>">
+  <a href="<%= news_item.url %>"><%= news_item.title %></a>
+</li>
+<% end %>
+</ul>
+
+<style>
+li.alchemy {
+	padding: 1em;
+}
+
+li.neg_neutral {
+	background-color: lightgrey;
+}
+li.propoganda {
+	background-color: yellow;
+	font-size: small;
+}
+
+li.negative {
+	background-color: red;
+}
+
+li.negative a, li.propoganda a {
+	color: black;
+}
+li.pos_neutral {
+	background-color: lightgreen;
+	font-size: large;
+}
+
+li.positive {
+	background-color: green;
+        font-size: x-large;
+}
+
+li.positive a {
+	color: white;
+}
+</style>
+

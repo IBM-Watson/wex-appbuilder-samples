@@ -1,0 +1,20 @@
+<script>
+var fetch_weather_json = function() {
+	$(".weather").each(function() {
+		var zipcode = $(this).data('zip');
+		var targetnode = $(this)
+		$.get("http://query.yahooapis.com/v1/public/yql?q=select%20item%20from%20weather.forecast%20where%20location%3D%22"+zipcode+"%22&format=json").done(function(weatherdata) {
+			targetnode.html("<div class='location'>"+weatherdata.query.results.channel.item.title+"</div>");
+			targetnode.append("<div class='report'>"+weatherdata.query.results.channel.item.description+"</div>");
+		});
+	});
+};
+
+$(function() {
+	fetch_weather_json();
+	});
+</script>
+
+
+<div class="weather" data-zip="15217">
+</div>

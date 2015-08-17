@@ -1,6 +1,3 @@
-# symbols for qandl are often specified by
-# exchange and symble.  GOOG becomes NASDAQ_GOOG
-# and MMM becomes NYSE_MMM
 symbol = params[:symbol]
 months_ago = params[:months].to_i
 
@@ -19,13 +16,20 @@ options = { "sort_order" => "asc",
 
 options["api_key"] = quandl_api_key unless quandl_api_key.nil?
 
-result = JSON.parse(HttpClient.request(url_string, :query => options).body)
-
-{ "name" => result["name"],
-  "description" => result["description"],
-  "prices" => result["data"].map {|data_row|
-    # We need time in epoch milli seconds for the plotting
-    epoch_seconds = Date.parse(data_row[0]).to_time.to_i * 1000
-    Struct::Price.new epoch_seconds,data_row[1],data_row[2],data_row[3],data_row[4],data_row[5]
-  }
-}
+response = HttpClient.request(url_string, :query => options)
+if (response.status == 200)
+   result = JSON.parse(response.body)
+   { "name" => result["name"],
+     "description" => result["description"],
+     "prices" => result["data"].map {|data_row|
+     # We need time in epoch milli seconds for the plotting
+     epoch_seconds = Date.parse(data_row[0]).to_time.to_i * 1000
+     Struct::Price.new epoch_seconds,data_row[1],data_row[2],data_row[3],data_row[4],data_row[5]
+     }
+   }
+else
+   { "name" => symbol,
+     "description" => "Got response code #{response.status}",
+     "prices" => []
+   }
+end

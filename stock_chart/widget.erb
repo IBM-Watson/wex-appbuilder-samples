@@ -3,6 +3,9 @@
 <%# and MMM becomes NYSE_MMM and IBM becomes NYSE_IBM %>
 <% data = endpoint("StockChart", months: "3", symbol: "NYSE_IBM") %>
  
+<h1><%= data["name"] %></h1>
+<p><%= data["description"] %></p>
+
 <%# this is where the actual chart goes %>
 <div id="stock_chart_container"></div>
  

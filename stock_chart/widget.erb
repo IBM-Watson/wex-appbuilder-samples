@@ -1,0 +1,97 @@
+<%# symbols for qandl are often specified by %>
+<%# exchange and symble.  GOOG becomes NASDAQ_GOOG %>
+<%# and MMM becomes NYSE_MMM and IBM becomes NYSE_IBM %>
+<% data = endpoint("StockChart", months: "3", symbol: "NYSE_IBM") %>
+ 
+<h1><%= data["name"] %></h1>
+<p><%= data["description"] %></p>
+
+<%# this is where the actual chart goes %>
+<div id="stock_chart_container"></div>
+ 
+<script>
+$(function () {
+  <%# here we slice the resulting data set to get the date and the open price %>
+  series = <%= raw JSON.dump(data["prices"].map {|price| [price.date, price.open] }) %>;
+ 
+    $('#stock_chart_container').highcharts({
+      chart: {
+        type: 'area',
+        height: 250
+      },
+      colors: ["#00B2EF", "#8CC63F"],
+      title: {
+          text: ''
+      },
+      credits: {
+        enabled: false
+      },
+      legend: {
+        enabled: false
+      },
+      tooltip: {
+        enabled: true
+      },
+        xAxis: {
+          type: 'datetime',
+            allowDecimals: false,
+            labels: {
+            },
+            style: {
+              color: '#a6a8ab',
+              fontSize: 8
+            }
+        },
+        yAxis: {
+            title: {
+                text: ''
+            },
+          lineColor: "#ffffff",
+          labels: {
+              style: {
+                color: '#a6a8ab',
+                fontSize: 8
+              }
+            },
+          gridLineColor: "#eeeeee",
+          minorTickInterval: 'auto',
+          minorGridLineColor: "#f8f8f8",
+          minorTickLength: 0
+        },
+        plotOptions: {
+            area: {
+              fillOpacity: 0.05,
+              marker: {
+                  enabled: false,
+                  symbol: 'circle',
+                  radius: 2,
+                  states: {
+                      hover: {
+                          enabled: true
+                      }
+                  }
+              }
+            }
+        },
+        series: [{
+            name: 'Price',
+            data: series
+        }]
+    })});
+ </script>
+ 
+<style>
+  g.highcharts-xaxis-labels text {
+    fill: #a6a8ab !important;
+    color: #a6a8ab !important;
+  }
+  g.highcharts-xaxis-labels text tspan {
+    font-size: 8px;
+  }
+  .small {
+    font-size: 8px;
+  }
+  .right {
+    text-align: right;
+  }
+</style>

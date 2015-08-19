@@ -13,7 +13,7 @@ this repository.
 
 ![Widget In Action](distance_widget.png)
 
-There are three user-adjustable parameters in the widget.  The first,
+There are three user-changeable variables in the widget.  The first,
 `how_many_to_show` sets the number of countries shown in the widget.
 The second, `output_format`, defines the distance output format.  This
 can be in miles, feet, meters, kilometers, or rods.  The last

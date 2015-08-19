@@ -13,9 +13,10 @@ asset prices.  This API allows for free access for low-frequency
 queries, however these have strict
 ![limits](http://help.quandl.com/article/68-is-there-a-rate-limit-or-speed-limit-for-api-usage).
 
-The ![endpoint](endpoint.erb) must be named "StockChart" and must take
-two parameters, `symbol` and `months`.  These control the stock symbol
-the data is for and a number of past months to fetch.
+The ![endpoint](endpoint.erb) must be named "StockChart". This
+endpoint uses two parameters, `symbol` and `months`.  The `symbol`
+parameter is used to pass in the exchange and stock symbols. The
+`months` parameter is the number of past months to fetch.
 
-[Parameters Needed](endpoint_params.png)
+
 

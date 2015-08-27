@@ -48,7 +48,7 @@ Make the following changes to the sample Proxy.
    
    `set :ta_endpoint, "http://YOUR_BLUEMIX_HOST.mybluemix.net/api/problem"`
 3. Enter the `lib/proxy.rb` file and add the following code block
-   ```
+```
 	post '/ta/' do
    		data = JSON.load(request.body)
 	    headers = {
@@ -57,7 +57,7 @@ Make the following changes to the sample Proxy.
 	    response = Excon.post(settings.taDemo_endpoint, :body => data.to_json, :headers => headers)
 	    response.body
 		end
-   	```
+```
 
 ### Creating a Watson Explorer Application Builder widget for Tradeoff Analytics
 

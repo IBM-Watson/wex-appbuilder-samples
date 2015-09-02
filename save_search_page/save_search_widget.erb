@@ -88,12 +88,12 @@ $( document ).ready(function() {
   $('.delete_query').on( "click", function() {
      var ajax_url = '<%= url_for_event(:ajax_display, { :source => unique_widget_id, :context => controller.context.to_json }) %>'
      var elem = $(this).parent();
-    var jxhr =
-      $.get(
-        ajax_url,
-        {del_query_key: $(this).attr('key')},
-        remove(),
-        "html"
+     var jxhr =
+        $.get(
+          ajax_url,
+          {del_query_key: $(this).attr('key')},
+          remove(),
+          "html"
         )
     function remove(){
        //removes the element on sucess

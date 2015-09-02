@@ -2,10 +2,10 @@
 
 # Description and Use #
 
-This widget is designed to be used on the search results page within Watson Explorer Application Builder.
+This widget allows a user to save the current search results page to their user profile within within Watson Explorer Application Builder. Users only see their own saved searches.
 
-The intention is to save the current url to the current_user.properties in zookeeper. We create a new store called current_user.properties["saved_searches"]. This property accepts a key/value pair. The key is a lable defined by the user and the value is always the applications current url. Currently if the user enters a key that already exists the current entry is updated.
+The intention is to save the current URL of a search page to the current user's profile. To achieve this we create a new store called current_user.properties["saved_searches"], which will store the data in the Apache ZooKeeper instance that is installed with the Application Builder product. This property accepts a key/value pair. The key is a label defined by the user and the value is always the applications current URL. If the user enters a key that already exists, the current entry is updated.
 
-We save the current relative url and params. This allows the user to select refinements, pages, etc and save the exact state of the page they are on.
+We save the current relative URL and parameters. This allows the user to select refinements, pages, etc and save the exact state of the page they are on.
 
 ![Screenshot](saved_search_screenshot_2.png)

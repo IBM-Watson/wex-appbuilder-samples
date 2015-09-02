@@ -105,16 +105,6 @@ $( document ).ready(function() {
         remove(),
         "html"
         )
-
-        .done(function() {
-          console.log( "second success" );
-        })
-        .fail(function() {
-          console.log( "error" );
-        })
-        .always(function() {
-          console.log( "finished" );
-        });
     function remove(){
        //removes the element on sucess
       $(elem).css("background-color", "#ffb2b2");

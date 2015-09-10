@@ -28,23 +28,28 @@
   relative_url = "#{request.path}?#{request.query_string}"
 
   # generate hash if it doesn't exist
-  if current_user.properties["saved_searches"].nil?
-    current_user.properties["saved_searches"] = {}
+if current_user.properties["#{current_user.id}_saved_searches"].nil?
+    current_user.properties["#{current_user.id}_saved_searches"] = {}
   end
 
   # delete a query
   if params["del_query_key"]
-    current_user.properties["saved_searches"].delete(params["del_query_key"] )
+    current_user.properties["#{current_user.id}_saved_searches"].delete(params["del_query_key"] )
   end
 
   # save new query
   if params["save_query_url"]
-    current_user.properties["saved_searches"].merge!({ params['save_query_label'] => params['save_query_url'] })
+    #get current zookeeper data
+    zk_hash = current_user.properties["#{current_user.id}_saved_searches"]
+    #add the new value to the hash
+    new_hash = zk_hash.merge!({ params['save_query_label'] => params['save_query_url'] })
+    #save the value to zookeeper
+    current_user.properties["#{current_user.id}_saved_searches"] = new_hash
   end
 %>
 
 <ul id="saved_query_list">
-  <% current_user.properties["saved_searches"].each do |key,val| %>
+  <% current_user.properties["#{current_user.id}_saved_searches"].each do |key,val| %>
   <li><a href="#" class="delete_query" key="<%= key %>">X</a><a href="<%= val %>" class="saved_link"><%= key %></a></li>
   <% end %>
 </ul>
@@ -78,22 +83,22 @@ $( document ).ready(function() {
             $('#saved_query_list').append(new_elem);
           },
           "html"
-        )
+        );
   });
 
-  $('.delete_query').on( "click", function(event) {
-    event.preventDefault();
+  $('.delete_query').on( "click", function() {
     var ajax_url = '<%= url_for_event(:ajax_display, { :source => unique_widget_id, :context => controller.context.to_json }) %>'
     var elem = $(this).parent();
+
     var jxhr =
-        $.get(
-          ajax_url,
-          {del_query_key: $(this).attr('key')},
-          remove(),
-          "html"
-        )
+      $.get(
+        ajax_url,
+        {del_query_key: $(this).attr('key')},
+        remove(),
+        "html"
+      );
     function remove(){
-       //removes the element on sucess
+      //removes the element on sucess
       $(elem).css("background-color", "#ffb2b2");
       $(elem).fadeOut();
     }

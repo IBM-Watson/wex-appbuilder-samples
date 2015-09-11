@@ -1,11 +1,13 @@
 <style>
   #save_message{
     width: 100%;
-    border: 1px solid #ddd;
-    background-color: #eee;
+    border: 1px solid #FF0000;
+    background-color: #FFB6C1;
     padding: .4em;
-    color: #666;
+    color: #8B0000;
+    font-weight:bold;
     display:none;
+    margin-top: 1em;
   }
 
   #saved_query_list .saved_link {
@@ -65,11 +67,20 @@ if current_user.properties["#{current_user.id}_saved_searches"].nil?
 $( document ).ready(function() {
   $("#save_search").submit(function(event) {
     event.preventDefault();
+    $('#save_message').fadeOut();
     var ajax_url = '<%= url_for_event(:ajax_display, { :source => unique_widget_id, :context => controller.context.to_json }) %>'
     var label = $(this).find('#search_label').val();
+
+    if (label == ''){
+      $('#save_message').html('Please enter a label');
+      $('#save_message').fadeIn();
+      return;
+    }
+
     var rel_url = '<%= relative_url %>';
     var new_elem = "<li class='new_item'><a href='"+rel_url+"' class='saved_link'>"+label+"</a>";
 
+    // submit ajax request
     var jxhr =
         $.get(
           ajax_url,
@@ -78,18 +89,19 @@ $( document ).ready(function() {
             save_query_url:  rel_url
           },
           function(data) {
-            //refresh the list on success
-            $(event.target).fadeOut();
+            //adds the element on success
             $('#saved_query_list').append(new_elem);
           },
           "html"
         );
   });
 
-  $('.delete_query').on( "click", function() {
+  $('.delete_query').on( "click", function(event) {
+    event.preventDefault();
     var ajax_url = '<%= url_for_event(:ajax_display, { :source => unique_widget_id, :context => controller.context.to_json }) %>'
     var elem = $(this).parent();
 
+    // submit ajax request
     var jxhr =
       $.get(
         ajax_url,

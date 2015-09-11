@@ -1,0 +1,60 @@
+<%
+
+  text_to_analyze = @subject['title'].join(" ")
+model = endpoint("personality_insights_text", text: text_to_analyze)
+
+%>
+
+<div><%= model["word_count_message"] %></div>
+<br />
+
+<% model["tree"]["children"].each do |major_category| %>
+
+  <center><h2><%= major_category["name"] %></h2></center>
+  <table class="um">
+    <tr>
+      <th>Value</th>
+      <th>Watson Score</th>
+    </tr>
+    <% major_category["children"].each do |sub_category| %>    
+       <% sub_category["children"].each do |sub_sub_category| %>
+          <% if sub_sub_category["percentage"] > 0.8 %>
+          <tr class="interesting">
+          <% else %>
+          <tr>
+          <% end %>
+            <td><%= sub_sub_category["name"] %></td>
+            <td><%= (sub_sub_category["percentage"] * 100).round(2) %> %</td>
+          </tr>
+       <% end %>  
+  <% end %>
+
+  </table>
+  <br />
+<% end %>
+  
+
+
+<style>
+
+table.um
+{
+  border: 1px solid black;
+  width: 100%;
+  margin: 5px;
+}
+
+table.um tr, table.um td, table.um th
+{
+  border: 1px solid black;
+  text-align: cetner;
+  padding: 3px;
+}
+
+.interesting
+{
+  background-color: rgba(145,185,121,0.5);
+}
+
+
+</style>

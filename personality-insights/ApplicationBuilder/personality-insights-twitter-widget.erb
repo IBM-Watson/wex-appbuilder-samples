@@ -45,6 +45,8 @@
   
   $(function() {
     $(".go").click(function() {
+      $(".watson-status").show();
+      
       var endpoint = "/AppBuilder/endpoint/personality_insights_twitter";
       var handle = $("input[name='handle']").val();
            
@@ -55,10 +57,12 @@
         success: function(response) {
           response = JSON.parse(response);
           displayModel(response);
+          $(".watson-status").hide();
         },
           failure: function(error) {
             console.log(error);
             $(".user_model").empty().append(error);
+            $(".watson-status").hide();
           }
         });
       
@@ -73,6 +77,7 @@
 
 <span>Twitter Handle:</span> <input type="text" name="handle" value="IBMWatson" />
 <input type="submit" value="Generate Insights!" class="go">
+<div class="watson-status" style="display:none;">Asking Watson...</div>
 
 
 <div class="user_model"></div>

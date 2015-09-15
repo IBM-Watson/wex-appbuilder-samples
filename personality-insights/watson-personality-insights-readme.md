@@ -9,12 +9,12 @@ The goal of this example is to demonstrate how to get started with an integratio
 
 
 ## Prerequisites
-Please see the [Introduction](/README.md) for an overview of the integration architecture, and the tools and libraries that need to be installed to create Java-based applications in Bluemix.
+Please see the [Introduction](/intro-to-bluemix-for-app-builder.md) for an overview of the integration architecture, and the tools and libraries that need to be installed to create Java-based applications in Bluemix.
 
 - An [IBM Bluemix](https://ace.ng.bluemix.net/) account
 - [Watson Explorer](http://www-01.ibm.com/support/knowledgecenter/SS8NLW_11.0.0/com.ibm.swg.im.infosphere.dataexpl.install.doc/c_install_wrapper.html) - Installed, configured, and running
 - A basic search application configured in Application Builder. For the purposes of this example, the [example-metadata based tutorial application](http://www-01.ibm.com/support/knowledgecenter/SS8NLW_11.0.0/com.ibm.swg.im.infosphere.dataexpl.appbuilder.doc/c_de-ab-devapp-tutorial.html) is sufficient.
-- (Optional) [Prerequisites for creating a Bluemix Ruby based application](/README.md#ruby-sinatra-web-based-applications). This prerequisite is required if you would like to develop Ruby applications on your local machine.
+- (Optional) [Prerequisites for creating a Bluemix Ruby based application](/intro-to-bluemix-for-app-builder.md#ruby-sinatra-web-based-applications). This prerequisite is required if you would like to develop Ruby applications on your local machine.
 - (Optional) A Twitter account with API access.  This will be used to fetch status updates given a user's Twitter handle in one of the example widgets.
 
 If you are using a version of Watson Explorere less than 11.0 you will also need to install and configure the [WEX App Builder Sample Proxy](https://github.com/IBM-Watson/wex-appbuilder-sample-proxy)
@@ -102,21 +102,22 @@ Two sample endpoints are provided, one for text and another that takes a Twitter
 1. From the Application Builder Admin console, navigate to the Endpoints section and create an Endpoint named `personality_insights_text`.
 2. Add a new parameter called `text`.  The sample text can be anything.
 3. Copy the code from [personality-insights-text-endpoint.rb](/personality-insights/ApplicationBuilder/personality-insights-text-endpoint.rb)
-4. Test the endpoint.
-5. Save it.
+4. Update the endpoint variable to point to your Bluemix application route by changing `YOUR_ENDPOINT_HERE` to use your application's route.
+5. Test the endpoint.
+6. Save it.
 
 **Twitter Endpoint**
 1. From the Application Builder Admin console, navigate to the Endpoints section and create an Endpoint named `personality_insights_twitter`.
 2. Add a new parameter called `handle`.  The sample text can be `IBMWatson`
 3. Copy the code from [personality-insights-twitter-endpoint.rb](/personality-insights/ApplicationBuilder/personality-insights-twitter-endpoint.rb)
-4. Test the endpoint
-5. Save it.
+4. Update the endpoint variable to point to your Bluemix application route by changing `YOUR_ENDPOINT_HERE` to use your application's route.
+5. Test the endpoint
+6. Save it.
 
 
 
 #### Sample Proxy Configuration (for < WEX 11)
-To use the proxy you must [update the Application Builder Proxy configuration](/proxy/config.ru) to point to your deployed Bluemix application.
-
+To use the proxy you must [update the Application Builder Proxy configuration](https://github.com/IBM-Watson/wex-appbuilder-sample-proxy/blob/master/config.ru) to point to your deployed Bluemix application.  Add the following line, updating the `MY_APPLICATION_ENDPOINT` to use your applications route URL.
 
 ```ruby
 set :pi_endpoint, "http://MY_APPLICATION_ENDPOINT.mybluemix.net/pi/"

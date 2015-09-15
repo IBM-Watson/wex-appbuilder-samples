@@ -1,74 +1,103 @@
-<script src="javascripts/d3.js"></script>
-<script src="javascripts/personality-insights-visualization.js"></script>
-<style src="stylesheets/personality-insights-visualization-style.css"></style>
-
 
 <script>
-
-function createGraphic(profile) {
-  var width = 900;
-  var height = 800;
-
-  $('.progress').hide();
-
-  var d3vis = d3.select("#user-visualization").append("svg:svg");
-  var widget = {
-     d3vis: d3vis,
-     data: profile,
-     loadingDiv: "dummy",
-     switchState: function() { console.log("[switchState]");},
-     _layout:     function() { console.log("[_layout]"); },
-     showTooltip: function() { console.log("[showTooltip]"); },
-     id: "SystemUWidget",
-       COLOR_PALLETTE: ["#1b6ba2","#488436","#d52829","#F53B0C","#972a6b","#8c564b","#dddddd"],
-        expand: function() {
-        this.vis.selectAll("g").each(function(d, i) {
-           var g = d3.select(this);
-           if(g.datum().parent != null && // Isn't the root g object.
-              g.datum().parent.parent != null && // Isn't the feature trait.
-              g.datum().parent.parent.parent != null) {// Isn't the feature dominant trait.
-              g.attr("visibility", "visible");
-           };
-        });
-     }
-  };
   
-  widget.dimH = height;
-  widget.dimW = width;
-  widget.d3vis.attr("width", widget.dimW).attr("height", widget.dimH);
-  renderChart.call(widget);
-  widget.expand.call(widget);
-}
+  function displayModel(model) {
+    var $model_container = $(".user_model").empty(); 
+    
+    // model_container.append(JSON.stringify(model));
+    
+    if (model["word_count_message"] !== undefined) {
+      $("<div>").append(model["word_count_message"]).append("<br>").appendTo($model_container);  
+    }
+         
+      
+    for (var i in model["tree"]["children"]) {
+      var major_category = model["tree"]["children"][i];
+      $("<center>").append($("<h2>").append(major_category["name"])).appendTo($model_container);
+            
+      var $table = $("<table>").addClass("um");
+      $table.append("<tr><th>Value</th><th>Watson Score</th></tr>");
+      
+      for (var j in major_category["children"]) {
+        var sub_category = major_category["children"][j];
+                              
+        for (var k in sub_category["children"]) {
+          var sub_sub_category = sub_category["children"][k];
+        
+          var $row = $("<tr>");
+            
+          if (sub_sub_category["percentage"] > 0.8) {
+            $row.addClass("interesting");
+          }
+          
+          var $name = $("<td>").append(sub_sub_category["name"]);
+          var $score = $("<td>").append((sub_sub_category["percentage"] * 100).toFixed(3));
+          
+          $row.append($name).append($score);
+          $table.append($row);
+        }
+      }    
 
-
+      $model_container.append($table).append("<br>");
+    }
+  }
+  
+  
   $(function() {
-    $(".check-pi").click(function() {
-      $("#user-visualization").empty();
-      $('.progress').show();
-
+    $(".go").click(function() {
+      var endpoint = "/AppBuilder/endpoint/personality_insights_twitter";
       var handle = $("input[name='handle']").val();
-
+           
       $.ajax({
         type: "POST",
-        url: "/AppBuilder/endpoint/personality_insights_twitter",
+        url: endpoint,
         data: { "handle" : handle },
-        success: function(response, status) {
-          createGraphic(JSON.parse(response));
+        success: function(response) {
+          response = JSON.parse(response);
+          displayModel(response);
         },
-        failure: function(error) {
-          $("#user_visualization").empty().append(error);
-        }
-      });
+          failure: function(error) {
+            console.log(error);
+            $(".user_model").empty().append(error);
+          }
+        });
       
     });
   });
+  
   
 </script>
 
 
 
-<span>Twitter Handle:</span> <input type="text" name="handle" value="IBMWatson" />
-<input type="submit" value="Generate Insights!" class="check-pi">
-<div class="progress" style="display: none;">Fetching Tweets...</div>
 
-<center><div id="user-visualization" class="chartDiv" height="800" width="900"></div></center>
+<span>Twitter Handle:</span> <input type="text" name="handle" value="IBMWatson" />
+<input type="submit" value="Generate Insights!" class="go">
+
+
+<div class="user_model"></div>
+
+
+<style>
+
+table.um
+{
+  border: 1px solid black;
+  width: 100%;
+  margin: 5px;
+}
+
+table.um tr, table.um td, table.um th
+{
+  border: 1px solid black;
+  text-align: cetner;
+  padding: 3px;
+}
+
+.interesting
+{
+  background-color: rgba(145,185,121,0.5);
+}
+
+
+</style>

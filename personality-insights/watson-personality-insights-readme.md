@@ -180,17 +180,7 @@ __*The "Sent Text" Personality Insights widget*__
 
 #### Building Personality Insights Widget #2: Twitter Status Personality Insight Widget
 
-The purpose of this widget is to let users add supplementary information to the 360 degree view of the current entity. For example, if you were looking at a customer page you could ask the customer for their Twitter handle, which will then allow you to create a model that might be correlated with information available from other systems accessible from the entity page within Application Builder. For the purposes of the example, we're going to add the widget to the Home page.
-
-Before starting the work in Application Builder, we first need to add some javascript and css styling to help with the rich visualization we are going to display. Follow these steps to add in these additional assets. 
-
-$AB_HOME refers to the home folder for the specific Application Builder installation.  For example, on a default Windows installation, `$AB_HOME` might be C:\Program Files\IBM\IDE\AppBuilder
-
-1. Copy the [D3 javascript](ApplicationBuilder/d3.js) into the folder $AB_HOME/wlp/usr/servers/AppBuilder/apps/AppBuilder/javascripts
-2. Copy the [Personality Insights javascript](ApplicationBuilder/personality-insights-visualization.js) into the folder $AB_HOME/wlp/usr/servers/AppBuilder/apps/AppBuilder/javascripts
-3. Copy the [Personality Insights css](ApplicationBuilder/personality-insights-visualization-style.css) into the folder $AB_HOME/wlp/usr/servers/AppBuilder/apps/AppBuilder/stylesheets
-
-Now we can begin the process of configuring Application Builder. 
+The purpose of this widget is to demonstrate the use of an Ajax widget that gets information at run time.  For example, if you were looking at a customer page you could ask the customer for their Twitter handle, which will then allow you to create a model that might be correlated with information available from other systems accessible from the entity page within Application Builder. For the purposes of the example, we're going to add the widget to the Home page.
 
 Once you have logged into the Application Builder Administration tool, follow these steps to create the custom widget and add it to the search results page.
 
@@ -201,16 +191,9 @@ Once you have logged into the Application Builder Administration tool, follow th
 5. Copy and paste the [code for this widget](ApplicationBuilder/personality-insights-twitter-widget.erb) into the Type Specific Configuration.
 6. Save the widget.
 7. Go back to the Home page.
-8. Change the layout to the two pane layout to allow for more room for the widget.
-8. Add the `watson_twitter_pi` widget to the largest column on the Home page and save the page configuration.
+8. Add the `watson_twitter_pi` widget to the Home page and save the page configuration.
 
-At this point the widget should be fully configured.  To test the widget, navigate to the Application Builder Home page.  Your widget should be visible.  Try entering your Twitter handle or using the IBM Watson Twitter stream, `IBMWatson`. Once you've submitted the form, your Bluemix service will fetch about 200 Twitter status updates for the provided handle. The resulting analysis from Watson will be displayed under the form in the widget.
-
-![Screen shot of Twitter-based Personality Insights widget.](ApplicationBuilder/personality-insights-twitter-analysis.png)
-
-__*The "Twitter Status" Personality Insights widget*__
-
-[The widget](ApplicationBuilder/personality-insights-twitter-widget.erb) is fully commented if you are curious about how the code works or are interested in extending the example functionality in a new widget.  One obvious extension is creating a widget that automatically fetches Tweets based on a handle stored in an entity field rather than waiting for a user to enter a Twitter user name in the browser after the fact.
+At this point the widget should be fully configured.  To test the widget, navigate to the Application Builder Home page.  Your widget should be visible.  Try entering your Twitter handle or using the IBM Watson Twitter stream, `IBMWatson`. Once you've submitted the form, your Bluemix service will fetch about 200 Twitter status updates for the provided handle. The resulting analysis from Watson will be displayed under the form in the widget. One obvious extension is creating a widget that automatically fetches Tweets based on a Twitter handle stored in an entity field rather than waiting for a user to enter a Twitter user name in the browser after the fact.
 
 
 ### Production and Deployment Considerations

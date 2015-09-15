@@ -1,4 +1,4 @@
-endpoint_url = "http://wex-pi-helpers.mybluemix.net/pi/model_text/"
+endpoint_url = "http://YOUR_ENDPOINT_HERE.mybluemix.net/pi/model_text/"
 
 raise "Missing required parameter: text" unless params[:text]
 

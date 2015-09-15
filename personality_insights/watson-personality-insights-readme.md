@@ -72,7 +72,7 @@ The Twitter enabled widget requires a valid [Twitter API](https://dev.twitter.co
 3. Create a new App.
 4. Fill out the form and agree to Twitter's Terms of Service.  A Callback URL is not required for this sample application.
 5. The next page will show a summary of your Twitter API application.  Click on the "Keys and Access Tokens" tab.
-6. The `Consumer Key (API Key)` and `Consumer Secret (API Secret)` are what you'll need to connect your Watson Bluemix application to Twitter.  Change lines 17 and 18 of [application_controller.rb](BlueMix/controllers/application_controller.rb) to reflect your `API key` and `API secret`. It is not necessary to generate a Twitter access token for the integration. 
+6. The `Consumer Key (API Key)` and `Consumer Secret (API Secret)` are what you'll need to connect your Watson Bluemix application to Twitter.  Change lines 17 and 18 of [application_controller.rb](/personality_insights/BlueMix/controllers/application_controller.rb) to reflect your `API key` and `API secret`. It is not necessary to generate a Twitter access token for the integration. 
 
 
 ```ruby
@@ -99,17 +99,19 @@ This example includes two widgets.  Both custom widgets require the use of the A
 Two sample endpoints are provided, one for text and another that takes a Twitter handle.
 
 **Text Endpoint**
+
 1. From the Application Builder Admin console, navigate to the Endpoints section and create an Endpoint named `personality_insights_text`.
 2. Add a new parameter called `text`.  The sample text can be anything.
-3. Copy the code from [personality-insights-text-endpoint.rb](/personality-insights/ApplicationBuilder/personality-insights-text-endpoint.rb)
+3. Copy the code from [personality-insights-text-endpoint.rb](/personality_insights/ApplicationBuilder/personality-insights-text-endpoint.rb)
 4. Update the endpoint variable to point to your Bluemix application route by changing `YOUR_ENDPOINT_HERE` to use your application's route.
 5. Test the endpoint.
 6. Save it.
 
 **Twitter Endpoint**
+
 1. From the Application Builder Admin console, navigate to the Endpoints section and create an Endpoint named `personality_insights_twitter`.
 2. Add a new parameter called `handle`.  The sample text can be `IBMWatson`
-3. Copy the code from [personality-insights-twitter-endpoint.rb](/personality-insights/ApplicationBuilder/personality-insights-twitter-endpoint.rb)
+3. Copy the code from [personality-insights-twitter-endpoint.rb](/personality_insights/ApplicationBuilder/personality-insights-twitter-endpoint.rb)
 4. Update the endpoint variable to point to your Bluemix application route by changing `YOUR_ENDPOINT_HERE` to use your application's route.
 5. Test the endpoint
 6. Save it.
@@ -162,7 +164,7 @@ Once you have logged into the Application Builder Administration tool, follow th
 2. Create a Custom new widget.
 3. Set the ID of the widget to be `Watson_PI`
 4. Set the title of the widget to be `Watson Personality Insights`
-5. Copy and paste the [code for this widget](ApplicationBuilder/personality-insights-text-widget.erb) into the Type Specific Configuration.
+5. Copy and paste the [code for this widget](/personality_insights/ApplicationBuilder/personality-insights-text-widget.erb) into the Type Specific Configuration.
 6. Click to turn "Asynchronously load content" on.
 7. Save the widget.
 8. Go back to the Book Title page
@@ -172,11 +174,11 @@ At this point the widget should be fully configured.  To test the widget, naviga
 
 This simple example illustrates a basic integration. You should choose text that is relevant to a user or entity that you are modeling and you must provide enough text to generate a reliable model.  See the [Personality Insights documentation](http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/personality-insights.html) for more guidance on text selection and recommendations.
 
-![Screen shot of "Watson Personality Insights" widget.](ApplicationBuilder/presonality-insights-widget.png)
+![Screen shot of "Watson Personality Insights" widget.](/personality_insights/ApplicationBuilder/presonality-insights-widget.png)
 
 __*The "Sent Text" Personality Insights widget*__
 
-[The widget](ApplicationBuilder/personality-insights-text-widget.erb) is fully commented if you are curious about how the code works or are interested in extending the example functionality in a new widget.
+[The widget](/personality_insights/ApplicationBuilder/personality-insights-text-widget.erb) is fully commented if you are curious about how the code works or are interested in extending the example functionality in a new widget.
 
 
 #### Building Personality Insights Widget #2: Twitter Status Personality Insight Widget
@@ -189,7 +191,7 @@ Once you have logged into the Application Builder Administration tool, follow th
 2. Create a Custom new widget.
 3. Set the ID of the widget to be `watson_twitter_pi`
 4. Set the title of the widget to be `Watson Personality Insight - Twitter`
-5. Copy and paste the [code for this widget](ApplicationBuilder/personality-insights-twitter-widget.erb) into the Type Specific Configuration.
+5. Copy and paste the [code for this widget](/personality_insights/ApplicationBuilder/personality-insights-twitter-widget.erb) into the Type Specific Configuration.
 6. Save the widget.
 7. Go back to the Home page.
 8. Add the `watson_twitter_pi` widget to the Home page and save the page configuration.

@@ -36,7 +36,10 @@ if current_user.properties["#{current_user.id}_saved_searches"].nil?
 
   # delete a query
   if params["del_query_key"]
-    current_user.properties["#{current_user.id}_saved_searches"].delete(params["del_query_key"] )
+    # delete from current user properties in memory
+    current_user.properties["#{current_user.id}_saved_searches"].delete(params["del_query_key"])
+    #commit to zookeeper
+    current_user.properties["#{current_user.id}_saved_searches"] = current_user.properties["#{current_user.id}_saved_searches"]
   end
 
   # save new query

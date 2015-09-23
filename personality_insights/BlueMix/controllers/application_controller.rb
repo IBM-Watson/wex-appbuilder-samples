@@ -17,6 +17,8 @@ class ApplicationController < Sinatra::Base
   set :twitter_api_key, "ENTER API KEY HERE"
   set :twitter_api_secret, "ENTER API SECRET HERE"  # you shouldn't really do this way since it's not that
                                                     # secure, but for a demo, it's at least excusable...  
+                                                    # see Twitter using OAuth for more information 
+                                                    # https://dev.twitter.com/oauth
   
   def self.get_endpoint
     rack_env = "RACK_ENV"

@@ -122,7 +122,7 @@ Two sample endpoints are provided, one for text and another that takes a Twitter
 To use the proxy you must [update the Application Builder Proxy configuration](https://github.com/IBM-Watson/wex-appbuilder-sample-proxy/blob/master/config.ru) to point to your deployed Bluemix application.  Add the following line, updating the `MY_APPLICATION_ENDPOINT` to use your applications route URL.
 
 ```ruby
-set :pi_endpoint, "http://MY_APPLICATION_ENDPOINT.mybluemix.net/pi/"
+set :personality_insights_endpoint, "http://MY_APPLICATION_ENDPOINT.mybluemix.net/pi/"
 ```
 
 
@@ -165,20 +165,57 @@ Once you have logged into the Application Builder Administration tool, follow th
 3. Set the ID of the widget to be `Watson_PI`
 4. Set the title of the widget to be `Watson Personality Insights`
 5. Copy and paste the [code for this widget](/personality_insights/ApplicationBuilder/personality-insights-text-widget.erb) into the Type Specific Configuration.
-6. Click to turn "Asynchronously load content" on.
-7. Save the widget.
-8. Go back to the Book Title page
-9. Add the `Watson_PI` widget to the Book Title page and save the page configuration.
+6. If necessary, update the line `model = endpoint("personality_insights_text", text: text_to_analyze)` to either use your endpoint name.  If not using App Builder Endpoints (pre-WEX 11), the snippet below shows how you can use the Ruby URI::HTTP class to build a request for either the Sample Proxy or Bluemix.
+7. Click to turn "Asynchronously load content" on.
+8. Save the widget.
+9. Go back to the Book Title page
+10. Add the `Watson_PI` widget to the Book Title page and save the page configuration.
 
 At this point the widget should be fully configured.  To test the widget, navigate to the application and choose a Book Title entity. The example shown in the below image uses the title from "Lug Nuts!" to create the model displayed. 
 
 This simple example illustrates a basic integration. You should choose text that is relevant to a user or entity that you are modeling and you must provide enough text to generate a reliable model.  See the [Personality Insights documentation](http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/personality-insights.html) for more guidance on text selection and recommendations.
 
-![Screen shot of "Watson Personality Insights" widget.](/personality_insights/ApplicationBuilder/presonality-insights-widget.png)
+![Screen shot of "Watson Personality Insights" widget.](/personality_insights/ApplicationBuilder/personality-insights-widget.png)
 
 __*The "Sent Text" Personality Insights widget*__
 
 [The widget](/personality_insights/ApplicationBuilder/personality-insights-text-widget.erb) is fully commented if you are curious about how the code works or are interested in extending the example functionality in a new widget.
+
+##### Using Ruby URI::HTTP in a WEX < 11.0 Widget
+
+The following snippet demostrates using Ruby's [URI::HTTP](http://ruby-doc.org/stdlib-2.2.3/libdoc/uri/rdoc/URI/HTTP.html) class.  This snippet only applies if you are ***not*** using App Builder Endpoints and using a version of WEX less than 11.0.  If you choose not to use App Builder Endpoints and you are using WEX 11+, you should at least still use the provided HTTP helper object provided by Application Builder.
+
+```
+# determine the endpoint for the proxy.
+# If you've deployed the Sample Proxy to the same server as Application Builder you can...
+origin = URI.parse(request.original_url)
+
+# Build your endpoint URL
+endpoint_builder = {
+  :host => origin.host,
+  :port => origin.port,
+  :scheme => origin.scheme,
+  :path => '/proxy/pi/model_text/'  # should correspond to the request handlers in your endpoint  
+}
+
+url = URI::HTTP.build(endpoint_builder)
+
+# choose the text you want to analyze
+data = {
+  :text => @subject['title'].join(" ")
+}.to_json
+
+# Make the http request
+req = Net::HTTP::Post.new(url.to_s)
+req.body = data
+req.content_type = 'content/json'
+response = Net::HTTP.start(url.hostname, url.port) do |http|
+  http.request(req)
+end
+
+# store the response for later use in the widget
+model = response.body
+```
 
 
 #### Building Personality Insights Widget #2: Twitter Status Personality Insight Widget
@@ -192,9 +229,10 @@ Once you have logged into the Application Builder Administration tool, follow th
 3. Set the ID of the widget to be `watson_twitter_pi`
 4. Set the title of the widget to be `Watson Personality Insight - Twitter`
 5. Copy and paste the [code for this widget](/personality_insights/ApplicationBuilder/personality-insights-twitter-widget.erb) into the Type Specific Configuration.
-6. Save the widget.
-7. Go back to the Home page.
-8. Add the `watson_twitter_pi` widget to the Home page and save the page configuration.
+6. If necessary, update the `endpoint` variable in the button click handler to use the proper URL for your endpoint.  If you've been following along these docs then no changes should be required.  You will need to update the URL if you are not using App Builder Endpoints or if you changed the endpoint function name. 
+7. Save the widget.
+8. Go back to the Home page.
+9. Add the `watson_twitter_pi` widget to the Home page and save the page configuration.
 
 At this point the widget should be fully configured.  To test the widget, navigate to the Application Builder Home page.  Your widget should be visible.  Try entering your Twitter handle or using the IBM Watson Twitter stream, `IBMWatson`. Once you've submitted the form, your Bluemix service will fetch about 200 Twitter status updates for the provided handle. The resulting analysis from Watson will be displayed under the form in the widget. One obvious extension is creating a widget that automatically fetches Tweets based on a Twitter handle stored in an entity field rather than waiting for a user to enter a Twitter user name in the browser after the fact.
 

@@ -1,15 +1,15 @@
 <%
-
   text_to_analyze = @subject['title'].join(" ")
-model = endpoint("personality_insights_text", text: text_to_analyze)
-
+  model = endpoint("personality_insights_text", text: text_to_analyze)
+  # if you are not using App Builder Endpoints, you will need to update this 
+  # function to directly call either your proxy or the Bluemix application using
+  # the Ruby URI::HTTP class. 
 %>
 
 <div><%= model["word_count_message"] %></div>
 <br />
 
 <% model["tree"]["children"].each do |major_category| %>
-
   <center><h2><%= major_category["name"] %></h2></center>
   <table class="um">
     <tr>

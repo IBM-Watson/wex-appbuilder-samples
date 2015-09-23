@@ -1,16 +1,11 @@
-
 <script>
-  
   function displayModel(model) {
-    var $model_container = $(".user_model").empty(); 
-    
-    // model_container.append(JSON.stringify(model));
+    var $model_container = $(".user_model").empty();   
     
     if (model["word_count_message"] !== undefined) {
       $("<div>").append(model["word_count_message"]).append("<br>").appendTo($model_container);  
     }
-         
-      
+           
     for (var i in model["tree"]["children"]) {
       var major_category = model["tree"]["children"][i];
       $("<center>").append($("<h2>").append(major_category["name"])).appendTo($model_container);
@@ -47,6 +42,9 @@
     $(".go").click(function() {
       $(".watson-status").show();
       
+      // Determine the correct URL for your personality insights server side code
+      // and update the URL here. If you're using App Builder endpoints and following
+      // along with the GitHub docs, this URL should work.
       var endpoint = "/AppBuilder/endpoint/personality_insights_twitter";
       var handle = $("input[name='handle']").val();
            

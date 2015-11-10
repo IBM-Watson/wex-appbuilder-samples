@@ -54,7 +54,7 @@ This example includes two widgets.  both custom widgets require the use of the A
 
 Two sample endpoints are provided, one for the text based list widget and another for the news sentiment trend widget.
 
-** News List Endpoint **
+**News List Endpoint**
 
 This endpoint will search AlchemyData News and return summarized snippets of the top `N` news articles.
 
@@ -76,7 +76,7 @@ This endpoint will search AlchemyData News and return summarized snippets of the
 6. Save it.
 
 
-** News Sentiment Trend Endpoint **
+**News Sentiment Trend Endpoint**
 
 This endpoint will search AlchemyData News and return a computed histogram of news articles for a given time period so they can be graphed.
 
@@ -135,7 +135,7 @@ Exercise for the reader:  Combine both of the news list and trend widgets into a
 
 # Implementation Considerations
 
-At this point the widget should be fully configured.  **However, you may find far more relevant news results** for your data if you specify the entity type as part of the news query.  See the AlchemyAPI documentation for [details about using entity types](http://docs.alchemyapi.com/v1.0/docs/entities) as well as [nearly 400 other parameters](http://docs.alchemyapi.com/v1.0/docs/full-list-of-supported-news-api-fields) that can be used to construct sophisticated News API queries.
+At this point the widget should be fully configured.  However, you may find far more relevant news results for your data if you specify the entity type as part of the news query.  See the AlchemyAPI documentation for [details about using entity types](http://docs.alchemyapi.com/v1.0/docs/entities) as well as [nearly 400 other parameters](http://docs.alchemyapi.com/v1.0/docs/full-list-of-supported-news-api-fields) that can be used to construct sophisticated News API queries.
 
 - **Improved Search Accuracy** - AlchemyData provides [nearly 400 other parameters](http://docs.alchemyapi.com/v1.0/docs/full-list-of-supported-news-api-fields) that can be used to construct sophisticated News API queries.  This sample demonstrates a simple starting query.
 - **Privacy and Security** - The AlchemyData News widget makes a web request to the Bluemix application endpoint configured in the Application Builder proxy.  In this example, this call is made over an unencrypted and unauthenticated HTTP connection, but your Bluemix application can be modified to support better security.

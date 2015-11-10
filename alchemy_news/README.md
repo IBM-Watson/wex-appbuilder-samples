@@ -70,7 +70,7 @@ This endpoint will search AlchemyData News and return summarized snippets of the
       * now-7d
   - max
       * 5
-3. Copy the code from [news-list-endpoint.rb](/alchemy_news/ApplicationBuilder/news-list-endpoint.rb)
+3. Copy the code from [news-list-endpoint.rb](appbuilder/alchemy-news-list-endpoint.rb)
 4. Update the API key in the endpoint to use your API key by replacing the text `YOUR_API_KEY_HERE`.
 5. Test the endpoint
 6. Save it.
@@ -92,7 +92,7 @@ This endpoint will search AlchemyData News and return a computed histogram of ne
      * now-7d
   - timeslice
      * 1d
-3. Copy the code from [news-trend-endpoint.rb](/alchemy_news/ApplicationBuilder/news-trend-endpoint.rb)
+3. Copy the code from [news-trend-endpoint.rb](appbuilder/alchemy-news-trend-endpoint.rb)
 4. Update the API key in the endpoint to use your API key by replacing the text `YOUR_API_KEY_HERE`.
 5. Test the endpoint
 6. Save it.

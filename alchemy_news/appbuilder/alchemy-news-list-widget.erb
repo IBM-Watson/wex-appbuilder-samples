@@ -1,0 +1,144 @@
+<select id="sentiment_select" name="sentiment">
+    <option value="">All</option>
+    <option value="positive">positive</option>
+    <option value="negative">negative</option>
+    <option value="neutral">neutral</option>
+</select>
+<select id="time_select" name="time">
+    <option value="12h">last 12 hours</option>
+    <option value="24h">last 24 hours</option>
+    <option value="7d">last week</option>
+</select>
+
+<input type="button" value="news" id="goButton" class="go" />
+
+<br />
+
+<div class="result"></div>
+
+<script>
+
+    // format the news for display
+    function displayNewsList(response) {
+        var container = $(".result").empty();
+        if (response["status"] == "ERROR") {
+            console.log(response["statusInfo"]);
+            container.append("News results unavailable at this time.");
+        }
+      
+        if (response["result"].hasOwnProperty('docs')) {
+            var docsArray = response["result"]["docs"];
+            var numDocs = docsArray.length;
+          
+            console.log(response);
+          
+            for (var i = 0; i < numDocs; ++i) {
+              var urlArray = docsArray[i]["source"]["enriched"]["url"];
+              var title = urlArray["title"];
+              var newsUrl = urlArray["url"];
+              var date = urlArray["publicationDate"]["date"];
+                
+              var concepts = urlArray["concepts"];
+              var numConcepts = concepts.length;
+              var conceptInfor = concepts[0]["text"];
+              
+              for (var j = 1; j < numConcepts; ++j) {
+                  var conceptInfor = conceptInfor + ", " + concepts[j]["text"];
+              }
+              
+              var domain = newsUrl.replace('http://', '').replace('https://', '').split(/[/?#]/)[0];
+
+              var dateDisplay = "";
+              if(date != null) {
+                var year = date.substring(0, 4);
+                var month = date.substring(4, 6);
+                var day = date.substring(6, 8);
+                var hour = date.substring(9, 11);
+                var min = date.substring(11, 13);
+                var sec = date.substring(13, 15);
+                var dateDisplay = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
+              }
+              
+              var sentiment = urlArray["docSentiment"];
+              var sentimentScore = (Math.abs(sentiment["score"]) * 100).toFixed(2);
+              var sentimentType = sentiment["type"];
+
+              container.append("<br />");
+              container.append("<a href='" + newsUrl + "' target='_blank'>" + title + "</a>").append("<br />");
+              container.append("<div class='watson_author'>" + domain + ", " + dateDisplay + "</div>").append("<br />");
+              container.append("<div class='sentiment'>" + sentimentScore + "% " + sentimentType + "</div>");
+              container.append("<div class='concepts'>" + "Concepts: " + conceptInfor + "</div>");
+            }
+        } else {
+            container.append("No relevant news found.");
+      }
+   }
+ 
+
+    // Performs the asynchronous request to the proxy using JQuery
+    $(function() {
+        $(".go").click(function() {
+            $(".result").empty().append("Getting News...");
+
+            // convert the input into JSON, and submit it to the proxy.
+            $.ajax({
+                type: "POST",
+                url: "/AppBuilder/endpoint/alchemy_news_list/",
+                data: {
+                    "start": "now-" + $("select[name='time']").val(),
+                    "end": "now",
+                    "query": "|text=<%= subject.title %>|",
+                    "sentiment": $("select[name='sentiment']").val()
+                },
+                success: function(response) {
+                  try {
+                    displayNewsList(JSON.parse(response));
+                  } catch (e) {
+                    console.log(e);
+                    $(".result").empty().append("News results unavailable at this time.");
+                  }
+                    
+                },
+                failure: function(error) {
+                    console.log(error);
+                    $(".result").empty().append("News results unavailable at this time.");
+                }
+            });
+
+        });
+
+
+        document.getElementById("goButton").click();
+    });
+</script>
+
+<!-- styling for the HTML output -->
+<style>
+    .watson_title {
+        font-size: 0.9em;
+        font-weight: bold;
+    }
+    
+    .watson_author {
+        transition: all 0.5s;
+        font-size: 0.6em;
+        border-bottom: 1px solid transparent;
+        padding: 0.2em 0 0em 0;
+        margin-right: 0.2em;
+        margin-bottom: 0.5em;
+        display: inline-block;
+    }
+    
+    .sentiment {
+        font-size: 0.8em;
+        margin-bottom: 3px;
+    }
+  
+    .concepts {
+       border-bottom: 1px solid #e6e6e6;
+       font-size: 0.8em;
+       margin-bottom: 0.9em;
+    }
+  
+    
+</style>

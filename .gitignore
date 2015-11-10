@@ -4,3 +4,4 @@ personality-insights/BlueMix/vendor
 personality-insights/BlueMix/.bundle/config
 personality_insights/BlueMix/vendor/*
 .bundle
+personality_insights/BlueMix/.otto/

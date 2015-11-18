@@ -1,6 +1,10 @@
 symbol = params[:symbol]
 months_ago = params[:months].to_i
 
+# We may need to set ciphers explicitly
+# see https://github.com/jruby/warbler/issues/340
+Excon.defaults[:ciphers] = 'DEFAULT'
+
 # if you have a quandl api key, put it here
 # and the code will use it, otherwise you are limited to 50
 # requests per day

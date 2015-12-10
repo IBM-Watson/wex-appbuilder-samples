@@ -71,7 +71,7 @@ This endpoint will search AlchemyData News and return summarized snippets of the
       * now-7d
   - max
       * 5
-3. Copy the code from [news-list-endpoint.rb](appbuilder/alchemy_news/ApplicationBuilder/news-list-endpoint.rb)
+3. Copy the code from [news-list-endpoint.rb](appbuilder/alchemy-news-list-endpoint.rb)
 4. Update the API key in the endpoint to use your API key by replacing the text `YOUR_API_KEY_HERE` (line 4)
 5. Test the endpoint
 6. Save it.
@@ -93,7 +93,7 @@ This endpoint will search AlchemyData News and return a computed histogram of ne
      * now-7d
   - timeslice
      * 1d
-3. Copy the code from [news-trend-endpoint.rb](appbuilder/alchemy_news/ApplicationBuilder/news-trend-endpoint.rb)
+3. Copy the code from [news-trend-endpoint.rb](appbuilder/alchemy-news-trend-endpoint.rb)
 4. Update the API key in the endpoint to use your API key by replacing the text `YOUR_API_KEY_HERE`.
 5. Test the endpoint
 6. Save it.
@@ -110,7 +110,7 @@ Once you have logged into the Application Builder administrative interface, foll
 2. Create a new Custom widget.
 3. Set the ID of the widget to be `alchemy_news_list_table`
 4. Set the Display name of the widget to be `AlchemyData News Search`
-5. Copy and paste the [code for this widget](appbuilder/alchemy-news-trend-widget.erb) into the Type-specific Configuration.
+5. Copy and paste the [code for this widget](appbuilder/alchemy-news-list-widget.erb) into the Type-specific Configuration.
 6. Save the widget.
 7. Go back to the Book Title > detail page.
 8. Drag the `alchemy_news_list_table` widget to the top of the right column and save the page configuration.

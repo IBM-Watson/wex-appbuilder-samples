@@ -1,4 +1,4 @@
-news_url = "http://access.alchemyapi.com/calls/data/GetNews"
+news_url = "https://gateway-a.watsonplatform.net/calls/data/GetNews"
 
 news_params = {
   :apikey => 'YOUR_API_KEY_HERE',

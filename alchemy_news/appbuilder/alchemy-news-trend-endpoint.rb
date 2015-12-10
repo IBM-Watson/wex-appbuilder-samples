@@ -1,9 +1,8 @@
-news_url = "http://access.alchemyapi.com/calls/data/GetNews"
+news_url = "https://gateway-a.watsonplatform.net/calls/data/GetNews"
 
 news_params = {
   :apikey => 'YOUR_API_KEY_HERE',
-  :outputMode => 'json',
-  :count => 10
+  :outputMode => 'json'
 }
 
 # params = JSON.parse(params, symbolize_names: true)

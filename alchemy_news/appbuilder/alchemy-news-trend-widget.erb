@@ -1,0 +1,141 @@
+<select id="sentiment_select" name="sentiment-trend">
+    <option value="all">All</option>
+    <option value="positive">positive</option>
+    <option value="negative">negative</option>
+    <option value="neutral">neutral</option>
+</select>
+<select id="time_select" name="time-trend">
+    <option value="12h">last 12 hours</option>
+    <option value="24h">last 24 hours</option>
+    <option value="7d">last week</option>
+</select>
+
+<input type="button" value="news" id="goButton-trend" class="go-trend" />
+
+<br />
+
+<div class="result-trend"></div>
+<div id="News_chart"></div>
+
+<script>
+    // format the news for display
+    function displayModel_trend(response) {
+        var container = $(".result-trend").empty();
+
+        if (response["status"] == "ERROR" || response["result"]["count"] == 0) {
+            container.append("News results unavailable at this time.");
+            $("#News_chart").hide();
+        }
+        
+        var numPerSlice = response["result"]["slices"];
+        var senti = $("select[name='sentiment-trend']").val();
+        
+        if (senti.length == 0) {
+            senti = "All";
+        }
+        
+        var category = [];
+        for (var i = 1; i <= 12; ++i) {
+            category.push(i);
+        }
+        
+        new Highcharts.Chart({
+            chart: {
+                zoomType: 'x',
+                height: 300,
+                renderTo: "News_chart"
+            },
+            title: {
+                text: 'News Trend',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: AlchemyAPI.com',
+                x: -20
+            },
+            xAxis: {
+                title: { text: 'Time Slice' },
+                categories: category
+            },
+            yAxis: {
+                title: { text: 'Number of news articles' },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: senti,
+                data: numPerSlice
+
+            }],
+            credits: { enabled: false },
+        });
+    }
+
+
+    // Performs the asynchronous request to the proxy using JQuery
+    $(function() {
+        $(".go-trend").click(function() {
+
+            // Set the proxy endpoint, and get the params from the input box
+            var endpoint = "/AppBuilder/endpoint/alchemy_news_api/";
+            var timelen = $("select[name='time-trend']").val();
+            var start = "now-" + timelen;
+            var end = "now";
+            var subtitle = "<%= subject.title %>";
+            
+            // see http://docs.alchemyapi.com/docs/full-list-of-supported-news-api-fields
+            // for the full list of searchable fields.  Be sure to check in the endpoint
+            // for the fields that are searchable.
+            var qEntity = "|text=" + subtitle + "|"; 
+            var qSentiment = $("select[name='sentiment-trend']").val();
+            
+            var timeSlice = "1h";
+            if (timelen == "7d") {
+                timeSlice = "1d";
+            }
+
+            // Let the user know Watson is working on this... 
+            $(".result-trend").empty();
+            $(".result-trend").empty().append("Getting News...");
+
+            // convert the input into JSON, and submit it to the proxy.
+            $.ajax({
+                type: "POST",
+                url: endpoint,
+                data: {
+                    "start": start,
+                    "end": end,
+                    "timeSlice": timeSlice,
+                    "query": qEntity,
+                    "sentiment": qSentiment,
+                },
+                success: function(response) {
+                    try {
+                        displayModel_trend(JSON.parse(response));
+                    } catch (e) {
+                        console.log(e);
+                        $(".result-trend").empty().append("News results unavailable at this time.");
+                    }
+
+                },
+                failure: function(error) {
+                    console.log(error);
+                    $(".result-trend").empty().append("News results unavailable at this time.");
+                }
+            });
+
+        });
+
+
+        document.getElementById("goButton-trend").click();
+    });
+</script>

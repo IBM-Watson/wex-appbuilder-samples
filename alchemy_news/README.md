@@ -102,7 +102,7 @@ This endpoint will search AlchemyData News and return a computed histogram of ne
 
 #### Configuring the News List Widget
 
-The purpose of this example widget is to perform a AlchemyData News API search for the entity name and display a list of recnet news articles.  The results of the AlchemyData News search are displayed in the Application Builder UI.
+The purpose of this example widget is to perform a AlchemyData News API search for the entity name and display a list of recent news articles.  The results of the AlchemyData News search are displayed in the Application Builder UI.
 
 Once you have logged into the Application Builder administrative interface, follow these steps to create the custom widget and add it to the Book Title entity.
 

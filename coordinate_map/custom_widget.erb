@@ -11,7 +11,7 @@ locationLon = 'your field name containing longitude'
 var JSON = <%= entity_type(entityName).requesting(9999999).to_json.html_safe %>
 var markers = [];
 for (index = 0; index < JSON.length; ++index) {
-  if (!JSON[index].properties.LocationLat) continue;
+  if (!JSON[index].properties.<%=locationLat.to_s%>) continue;
   markers.push({latLng: [JSON[index].properties.<%=locationLat.to_s%>, JSON[index].properties.<%=locationLon.to_s%>], name: JSON[index].properties.title});
   }
 var map = null;

@@ -1,0 +1,25 @@
+    <script>
+      $(function() {
+        $("#search-more").button().click(function(event) {
+          event.preventDefault();
+          // Entities other than the subject with
+          // Criteria: Same simpleAttr1 and same leaf value than the first hierarchicalAttr1
+          window.open("<%= endpoint("facetedSearch", id: subject['id'].first, mode:'queryString') %>");
+        });
+      });
+        $(function() {
+        $("#search-more2").button().click(function(event) {
+          event.preventDefault();
+          // Same search as before, but search page opens with refinements already set
+          window.open("<%= endpoint("facetedSearch", id: subject['id'].first, mode:'queryStringWithFacets') %>");
+        });
+      });
+      
+
+    </script>
+    <button id="search-more"  style="background-color: rgb(0, 110, 157) !important;background-image: none;">
+      Search more entities like this
+    </button>
+<button id="search-more2"  style="background-color: rgb(0, 110, 157) !important;background-image: none;">
+      Search more entities (Preset facets)
+    </button>

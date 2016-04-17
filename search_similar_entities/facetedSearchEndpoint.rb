@@ -1,114 +1,110 @@
-#QuerySimilar Endpoint
+#query_similar Endpoint
 
-#Builds complex query for"Query Similar" functionality; returns a link to the search page, with a preseeded query looking for all entities of type testEntity that share certain attributes with the current "testEntity" entity, or alternatively, the same query but with preselected facets
+#Builds complex query for"Query Similar" functionality; returns a link to the search page, with a preseeded query looking for all entities of type this_entity_type that share certain attributes with the current "this_entity_type" entity, or alternatively, the same query but with preselected facets
 
 # Verify params are OK
+raise "Missing required paramter: entity_type" unless params[:entity_type]
 raise "Missing required parameter: id" unless params[:id]
-raise "Missing required parameter: mode - Values: [queryString|queryStringWithFacets]" unless params[:mode]
-raise "Acceptable values for parameter mode: [queryString|queryStringWithFacets]" unless "queryString|queryStringWithFacets|".include? params["mode"] + '|'
-thisId = params[:id]
+raise "Missing required parameter: mode - Values: [query_string|query_string_with_facets]" unless params[:mode]
+raise "Acceptable values for parameter mode: [query_string|query_string_with_facets]" unless "query_string|query_string_with_facets|".include? params["mode"] + '|'
+this_entity_type = params[:entity_type]
+this_id = params[:id]
 return_mode = params[:mode]
 
 ## Utility Methods
 
 # Utility method to return the different "leaf" values found in the hierarchical attribute 
 # 'hierachicalAttr1' belonging
-# to a testEntity, that begin with level1value|level2value
-def getLeafValues(testEntity, level1value, level2value)
-  return testEntity['hierarchicalAttr1'].select { |a| a.start_with?(level1value + '|' + level2value) }.uniq
+# to a test_entity, that begin with level1_value|level2_value
+def get_leaf_values(test_entity, hierarchical_attr_name, level1_value, level2_value)
+  return test_entity[hierarchical_attr_name].select { |a| a.start_with?(level1_value + '|' + level2_value) }.uniq
 end
 
 # Utility method that adds n and k elements to a hash
-def addNKElementsToHash(theHash, nObj, kObj)
-  unless nObj.nil? or nObj.empty?
-    theHash['n'] = nObj
+def add_nk_elements_to_hash(the_hash, n_obj, k_obj)
+  unless n_obj.nil? or n_obj.empty?
+    the_hash['n'] = n_obj
   end
-  unless kObj.nil? or kObj.empty?
-    theHash['k'] = kObj
+  unless k_obj.nil? or k_obj.empty?
+    the_hash['k'] = k_obj
   end
-  return theHash
+  return the_hash
 end
   
 
 # Utility method to return the data structure that goes in the queryURL (as JSON) 
 # to make sure a given refinement widget is selected for a given value
-def getSimpleRefWidgetDataStruct(widgetName,xPath,logic,theValue)
+def get_simple_ref_widget_data_struct(widget_name,xPath,logic,the_value)
   
-  theValueHash = {"n" => theValue}
-  tmpHash = {"id" => widgetName, "logic" => logic, "s" => [theValueHash]}
-  unless xPath.empty?
-    tmpHash['xPath'] = xPath
-  end
-  return tmpHash
+  the_value_hash = {"n" => the_value}
+  hash_to_be_returned = {"id" => widget_name, "logic" => logic, "s" => [the_value_hash]}
+  hash_to_be_returned['xPath'] = xPath unless xPath.empty?
+  return hash_to_be_returned
   
 end 
 
 # Utility method to return the data structure that goes in the queryURL (as JSON) 
 # to make sure a given refinement widget (that has hierarchical values) is selected for a given value
-def getComplexRefWidgetDataStruct(widgetName,xPath,logic,theValue,separator)
+def get_complex_ref_widget_data_struct(widget_name,xPath,logic,the_value,separator)
   
-  tmpHash = {"id" => widgetName, "logic" => logic, "s" => theValue}
-  unless xPath.empty?
-    tmpHash['xPath'] = xPath
-  end
-  unless separator.empty?
-    tmpHash['separator'] = separator
-  end
-  return tmpHash
+  hash_to_be_returned = {"id" => widget_name, "logic" => logic, "s" => the_value}
+  hash_to_be_returned['xPath'] = xPath unless xPath.empty?
+  hash_to_be_returned['separator'] = separator unless separator.empty?
+  return hash_to_be_returned
   
 end 
 
 # Utility method to return the complex data structure that goes in the queryURL for a
 # nested refinement widget
-# theLabels has a number of labels separated by separator
+# the_labels has a number of labels separated by separator
 # starting from backwards, it adds the label, and the full path to the label
-def getComplexRefWidgetDataStructure(theLabels, separator)
-  labelArray = theLabels.split('|')
-  arrayOfHashes = []
-  until labelArray.empty? do
-    allLabels = labelArray.join('|')
+def get_complex_ref_widget_data_structure(the_labels, separator)
+  label_array = the_labels.split('|')
+  array_of_hashes = []
+  until label_array.empty? do
+    all_labels = label_array.join('|')
     h = {}
-    h = addNKElementsToHash(h,labelArray.last, allLabels)
-    arrayOfHashes << h
-    labelArray.pop # Remove the last label
+    h = add_nk_elements_to_hash(h,label_array.last, all_labels)
+    array_of_hashes << h
+    label_array.pop # Remove the last label
   end
-  # Now iterate over all the building blocks we've got so far, nesting each element as an "s" in the next hast
-  for i in 0 .. arrayOfHashes.count - 2
-    arrayOfHashes[i+1]['s'] = [arrayOfHashes[i]]
+  # Now iterate over all the building blocks we've got so far, nesting each element as an "s" in the next hash
+  for i in 0 .. array_of_hashes.count - 2
+    array_of_hashes[i+1]['s'] = [array_of_hashes[i]]
   end
-  return arrayOfHashes.last
+  return array_of_hashes.last
 end
 
 ## END Utility Methods
 
 # Now the real thing begins. Customise the search criteria as required
 
-# This query selects the testEntity entity to be used as a starting point
-thisTestEntity = entity_type('testEntity').where(field('id').is(thisId)).first
+# This query selects the test_entity entity to be used as a starting point
+this_test_entity = entity_type(this_entity_type).where(field('id').is(this_id)).first
 
-# Check that we have the basic attributes, otherwise return an basic query
+# Check that we have the basic attributes, otherwise return a basic query
 
-if thisTestEntity['simpleAttr1'].nil? or thisTestEntity['simpleAttr1'].empty?
-    output = URI.encode('../search?q=entityType:testEntity')
+if this_test_entity['simpleAttr1'].nil? or this_test_entity['simpleAttr1'].empty?
+    output = URI.encode('../search?q=entityType:test_entity')
 else
-# Start building the query string: Get the list of testEntity entities that match the simpleAttr1 value of this testEntity (and are not this testEntity)
+# Start building the query string: Get the list of test_entity entities that match the simpleAttr1 value of this test_entity (and are not this test_entity)
 
-  similarTestEntitiesQueryString = '../search?q=simpleAttr1:\''+thisTestEntity['simpleAttr1'].first  + '\' AND entityType:testEntity AND NOT(id:'+ thisTestEntity['id'].first+')'
+  similar_test_entities_query_string = '../search?q=simpleAttr1:\''+this_test_entity['simpleAttr1'].first  + '\' AND entityType:test_entity AND NOT(id:'+ this_id+')'
 
 # The following call uses a predefined refinement widget that filters based on the entity type
-entityTypeWidgetDataStruct = getSimpleRefWidgetDataStruct('%entityTypes%','','AND','testEntity')
+entity_type_widget_data_struct = get_simple_ref_widget_data_struct('%entityTypes%','','AND',this_entity_type)
 # Now will add a refinement based on simpleAttr1. The first argument needs to match the name of 
 # an existing refinement widget that refines based on simpleAttr1
-simpleAttr1WidgetDataStruct = getSimpleRefWidgetDataStruct('simpleAttr1RefinementWidget','$simpleAttr1','AND',thisTestEntity['simpleAttr1'].first)
+simple_attr1_widget_data_struct = get_simple_ref_widget_data_struct('simpleAttr1RefinementWidget','$simpleAttr1','AND',this_test_entity['simpleAttr1'].first)
 
-arrayOfvaluesForHierarchicalAttr1Widget = []
-# Now filter by an extra criterion - Having leaf values in the hierachical attribute hierarchicalAttr1 matching the first leaf value where starting with 'CCC1|CCC1_2'
-leafValues = getLeafValues(thisTestEntity,'CCC1','CCC1_2')
-hierarchicalAttr1ComplexDataStruct = {}
-unless leafValues.count == 0
-  similarTestEntitiesQueryString << ' AND hierarchicalAttr1:\'' + leafValues.first + '\''
-  hierarchicalAttr1ComplexDataStruct = getComplexRefWidgetDataStructure(leafValues.first, '|')
-  arrayOfvaluesForHierarchicalAttr1Widget << hierarchicalAttr1ComplexDataStruct
+array_of_values_for_hierarchical_attr1_widget = []
+# Now filter by an extra criterion - Having leaf values in the hierachical attribute hierarchicalAttr1 matching the first leaf value starting with 'CCC1|CCC1_2'
+leaf_values = get_leaf_values(this_test_entity, 'hierarchicalAttr1','CCC1','CCC1_2')
+hierarchical_attr1_complex_data_struct = {}
+unless leaf_values.count == 0
+  similar_test_entities_query_string << ' AND hierarchicalAttr1:\'' + leaf_values.first + '\''
+  hierarchical_attr1_complex_data_struct = get_complex_ref_widget_data_structure(leaf_values.first, '|')
+  array_of_values_for_hierarchical_attr1_widget << hierarchical_attr1_complex_data_struct
 end
 
 
@@ -116,46 +112,46 @@ end
 
 
 # We can finally build the dataStructure for the hierarcharAttr1 widget
-hierarchicalAttr1WidgetDataStruct = []
-unless arrayOfvaluesForHierarchicalAttr1Widget.empty?
+hierarchical_attr1_widget_data_struct = []
+unless array_of_values_for_hierarchical_attr1_widget.empty?
   # As before, the first argument needs to match the name of an existing search refinement widget
   # that refines based on hierarchicalAttr1
   # The second argument needs to match the name of the attribute
-  hierarchicalAttr1WidgetDataStruct = getComplexRefWidgetDataStruct('hierarchicalAttr1RefinementWidget','$hierarchicalAttr1','AND',arrayOfvaluesForHierarchicalAttr1Widget,'|')
+  hierarchical_attr1_widget_data_struct = get_complex_ref_widget_data_struct('hierarchicalAttr1RefinementWidget','$hierarchicalAttr1','AND',array_of_values_for_hierarchical_attr1_widget,'|')
 end
 
 
 # And we are now ready to build the query string including refinements
 
-similarTestEntitiesQueryStringWithRefinements = '../search?button=search&expand_all=false&id=&page=0&q=NOT(id:'+ thisTestEntity['id'].first+')'
+similar_test_entities_query_string_with_refinements = '../search?button=search&expand_all=false&id=&page=0&q=NOT(id:'+ this_id +')'
 
 # THere always needs to be a selected facet, make sure you use a facet which you know 
 # will have a value
-selectedTokensDataStruct = {'s' => [simpleAttr1WidgetDataStruct]}
+selected_tokens_data_struct = {'s' => [simple_attr1_widget_data_struct]}
 
-refinementTokensArray = []
-refinementTokensArray << entityTypeWidgetDataStruct # This one is always populated
-unless hierarchicalAttr1WidgetDataStruct.nil? or hierarchicalAttr1WidgetDataStruct.empty?
-  refinementTokensArray << hierarchicalAttr1WidgetDataStruct
+refinement_tokens_array = []
+refinement_tokens_array << entity_type_widget_data_struct # This one is always populated
+unless hierarchical_attr1_widget_data_struct.nil? or hierarchical_attr1_widget_data_struct.empty?
+  refinement_tokens_array << hierarchical_attr1_widget_data_struct
 end
 
-refinementTokensDataStruct = { 's' => refinementTokensArray }
+refinement_tokens_data_struct = { 's' => refinement_tokens_array }
 
-similarTestEntitiesQueryStringWithRefinements <<  '&refinements_token='+ refinementTokensDataStruct.to_json
+similar_test_entities_query_string_with_refinements << '&refinements_token='+ refinement_tokens_data_struct.to_json
  
-similarTestEntitiesQueryStringWithRefinements << '&selected_tokens[]='+selectedTokensDataStruct.to_json
+similar_test_entities_query_string_with_refinements << '&selected_tokens[]='+selected_tokens_data_struct.to_json
 
-similarTestEntitiesQueryStringWithRefinements << '&type=&utf8=✓'
+similar_test_entities_query_string_with_refinements << '&type=&utf8=✓'
 
 
 
 # Check what needs to be returned
 
 case return_mode
-when 'queryString' 
-  output = URI.escape(similarTestEntitiesQueryString)
+when 'query_string' 
+  output = URI.escape(similar_test_entities_query_string)
 else
     # return the query string including the facetc
-  output = URI.escape(similarTestEntitiesQueryStringWithRefinements)
+  output = URI.escape(similar_test_entities_query_string_with_refinements)
 end
  

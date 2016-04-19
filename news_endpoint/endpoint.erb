@@ -31,6 +31,6 @@ parsed_response = Nokogiri::HTML.parse(response)
 # because it is a 'More' link that doesn't do much for our purposes.
 parsed_response.xpath('//td[@class="title"]/a').map { |news_result|
   link = news_result.attributes['href'].to_s
-  title_clean = cleanlyEncode(news_result.to_s)
+  title = cleanlyEncode(news_result.text)
   Struct::NewsLink.new(link,title)
 }[0..-2]

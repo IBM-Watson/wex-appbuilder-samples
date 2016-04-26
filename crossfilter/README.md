@@ -12,4 +12,4 @@ comments that are shown under them.
 
 ![Crossfilter Example](crossfilter.png)
 
-The example assumes there is an entity called 'reviews'. CSV sample data is included.
+The example assumes there is an entity called 'review'. CSV sample data is included.

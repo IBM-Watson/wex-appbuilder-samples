@@ -1,0 +1,9 @@
+applications:
+- services:
+  - wex-lt
+  disk_quota: 1024M
+  name: wex-lt
+  path: wex-wdc-language-translation-sample.war
+  domain: mybluemix.net
+  instances: 1
+  memory: 512M

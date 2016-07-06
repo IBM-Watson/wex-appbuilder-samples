@@ -1,0 +1,475 @@
+<div>
+	<div id="charts">
+		<div id="score-chart" class="chart">
+			<div class="title">Review Score</div>
+		</div>
+		<div id="date-chart" class="chart">
+			<div class="title">Date</div>
+		</div>
+	</div>
+	<div id="totals"><span id="active">-</span> of <span id="total">-</span> reviews selected.</div>
+	<div id="lists">
+		<div id="review-list" class="list"></div>
+	</div>
+</div>
+
+<!-- These are the CDN includes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
+<script src="http://square.github.io/crossfilter/crossfilter.v1.min.js"></script>
+
+<script>
+  
+  function demo(reviews){
+  	// Various formatters.
+    var formatDate = d3.time.format("%B %d, %Y");
+    
+    // A nest operator, for grouping the review list.
+    var nestByDate = d3.nest()
+    	.key(function(r){ return d3.time.day(r.properties.Time); });
+
+	  //Coerce data
+	  reviews.forEach(function(r, i){
+		  r.index = i;
+		  r.properties.Time = new Date(r.properties.Time * 1000); //Epoch to Date
+	  });
+    
+  	var review = crossfilter(reviews),
+  		all = review.groupAll(),
+  		score = review.dimension(function(r){ return r.properties.Score; }),
+  		scores = score.group(),
+  		date = review.dimension(function(r){ return r.properties.Time; }),
+  		dates = date.group(d3.time.day);
+  
+	  var charts = [
+
+		  barChart()
+		    .dimension(score)
+		    .group(scores)
+		  .x(d3.scale.linear()
+		    .domain([0, 5.45])
+		    .rangeRound([0, 10 * 90])),
+
+		  barChart()
+		    .dimension(date)
+		    .group(dates)
+		    .round(d3.time.day.round)
+		  .x(d3.time.scale()
+		    .domain([new Date(2007, 0, 1), new Date(2012, 12, 1)])
+		    .rangeRound([0, 10 * 90]))
+		    .filter([new Date(2008, 0, 1), new Date(2012, 1, 1)])
+
+	  ];
+
+	  // Given our array of charts, which we assume are in the same order as the
+	  // .chart elements in the DOM, bind the charts to the DOM and render them.
+  	// We also listen to the chart's brush events to update the display.
+	  var chart = d3.selectAll(".chart")
+	    .data(charts)
+	    .each(function(chart){ chart.on("brush", renderAll).on("brushend", renderAll); });
+
+	  // Render the initial lists.
+	  var list = d3.selectAll(".list")
+		.data([reviewList]);
+
+	  // Render the total.
+  	d3.selectAll("#total")
+	    .text(review.size());
+
+	  renderAll();
+
+	  // Renders the specified chart or list.
+	  function render(method){
+		  d3.select(this).call(method);
+	  }
+
+	  // Whenever the brush moves, re-rendering everything.
+	  function renderAll(){
+		  chart.each(render);
+		  list.each(render);
+		  d3.select("#active").text(all.value());
+	  }
+
+	  window.filter = function(filters){
+		  filters.forEach(function(d, i) { charts[i].filter(d); });
+		  renderAll();
+	  };
+
+	  window.reset = function(i){
+		  charts[i].filter(null);
+		  renderAll();
+	  };
+
+    function reviewList(div){
+    	var reviewsByDate = nestByDate.entries(date.top(20));
+
+    	div.each(function() {
+    		var date = d3.select(this).selectAll(".date")
+          		.data(reviewsByDate, function(d) { return d.key; });
+
+          	date.enter().append("div")
+	        	.attr("class", "date")
+	          	.append("div")
+	          	.attr("class", "day")
+	          	.text(function(d) { return formatDate(d.values[0].properties.Time); });
+
+	      	date.exit().remove();
+
+	    	var review = date.order().selectAll(".review")
+	    		.data(function(r) { return r.values; }, function(r) { return r.index; });
+
+	    	var reviewEnter = review.enter().append("div")
+	    		.attr("class", "review");
+
+	    	reviewEnter.append("div")
+	    		.attr("class", "productId")
+	    		.text(function(r) { return r.properties.ProductId; });
+
+	    	reviewEnter.append("div")
+	    		.attr("class", "summary")
+	    		.html(function(r) { return r.properties.Summary; });
+
+	    	reviewEnter.append("div")
+	    		.attr("class", "text")
+	    		.html(function(r) { return r.properties.Text; });
+
+	    	review.exit().remove();
+
+	    	review.order();
+    	});
+    }
+    
+    function barChart(){
+	    if (!barChart.id) barChart.id = 0;
+
+	    var margin = {top: 10, right: 10, bottom: 20, left: 10},
+	        x,
+	        y = d3.scale.linear().range([100, 0]),
+	        id = barChart.id++,
+	        axis = d3.svg.axis().orient("bottom"),
+	        brush = d3.svg.brush(),
+	        brushDirty,
+	        dimension,
+	        group,
+	        round;
+
+	    function chart(div){
+	      var width = x.range()[1],
+	          height = y.range()[0];
+
+	      y.domain([0, group.top(1)[0].value]);
+
+	      div.each(function(){
+	        var div = d3.select(this),
+	            g = div.select("g");
+
+	        // Create the skeletal chart.
+	        if (g.empty()) {
+	          div.select(".title").append("a")
+	              .attr("href", "javascript:reset(" + id + ")")
+	              .attr("class", "reset")
+	              .text("reset")
+	              .style("display", "none");
+
+	          g = div.append("svg")
+	              .attr("width", width + margin.left + margin.right)
+	              .attr("height", height + margin.top + margin.bottom)
+	            .append("g")
+	              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	          // Create the svg:defs element and the main gradient definition.
+	          var svgDefs = g.append("defs");
+	          var mainGradient = svgDefs.append("linearGradient")
+	              .attr("id", "mainGradient")
+	              .attr("x1","0%")
+	              .attr("y1","0%")
+	              .attr("x2","0%")
+	              .attr("y2","100%");
+	          // Create the stops of the main gradient. Each stop will be assigned
+              // a class to style the stop using CSS.
+              mainGradient.append("stop")
+	              .attr("class", "stop-left")
+	              .attr("offset", "0");
+	          mainGradient.append("stop")
+	              .attr("class", "stop-right")
+	              .attr("offset", "1");
+
+	          g.append("clipPath")
+	              .attr("id", "clip-" + id)
+	            .append("rect")
+	              .attr("width", width)
+	              .attr("height", height);
+
+	          g.selectAll(".bar")
+	              .data(["background", "foreground"])
+	            .enter().append("path")
+	              .attr("class", function(d){ return d + " bar"; })
+	              .datum(group.all());
+
+	          g.selectAll(".foreground.bar")
+	              .attr("clip-path", "url(#clip-" + id + ")");
+
+	          g.append("g")
+	              .attr("class", "axis")
+	              .attr("transform", "translate(0," + height + ")")
+	              .call(axis);
+
+	          // Initialize the brush component with pretty resize handles.
+	          var gBrush = g.append("g").attr("class", "brush").call(brush);
+	          gBrush.selectAll("rect").attr("height", height);
+	          gBrush.selectAll(".resize").append("path").attr("d", resizePath);
+	        }
+
+	        // Only redraw the brush if set externally.
+	        if (brushDirty) {
+	          brushDirty = false;
+	          g.selectAll(".brush").call(brush);
+	          div.select(".title a").style("display", brush.empty() ? "none" : null);
+	          if (brush.empty()) {
+	            g.selectAll("#clip-" + id + " rect")
+	                .attr("x", 0)
+	                .attr("width", width);
+	          } else {
+	            var extent = brush.extent();
+	            g.selectAll("#clip-" + id + " rect")
+	                .attr("x", x(extent[0]))
+	                .attr("width", x(extent[1]) - x(extent[0]));
+	          }
+	        }
+
+	        g.selectAll(".bar").attr("d", barPath);
+	      });
+
+	      function barPath(groups){
+	        var path = [],
+	            i = -1,
+	            n = groups.length,
+	            d;
+	        while (++i < n) {
+	          d = groups[i];
+	          path.push("M", x(d.key), ",", height, "V", y(d.value), "h9V", height);
+	        }
+	        return path.join("");
+	      }
+
+	      function resizePath(d){
+	        var e = +(d == "e"),
+	            x = e ? 1 : -1,
+	            y = height / 3;
+	        return "M" + (.5 * x) + "," + y
+	            + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
+	            + "V" + (2 * y - 6)
+	            + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
+	            + "Z"
+	            + "M" + (2.5 * x) + "," + (y + 8)
+	            + "V" + (2 * y - 8)
+	            + "M" + (4.5 * x) + "," + (y + 8)
+	            + "V" + (2 * y - 8);
+	      }
+	    }
+
+	    brush.on("brushstart.chart", function(){
+	      var div = d3.select(this.parentNode.parentNode.parentNode);
+	      div.select(".title a").style("display", null);
+	    });
+
+	    brush.on("brush.chart", function(){
+	      var g = d3.select(this.parentNode),
+	          extent = brush.extent();
+	      if (round) g.select(".brush")
+	          .call(brush.extent(extent = extent.map(round)))
+	        .selectAll(".resize")
+	          .style("display", null);
+	      g.select("#clip-" + id + " rect")
+	          .attr("x", x(extent[0]))
+	          .attr("width", x(extent[1]) - x(extent[0]));
+	      dimension.filterRange(extent);
+	    });
+
+	    brush.on("brushend.chart", function(){
+	      if (brush.empty()) {
+	        var div = d3.select(this.parentNode.parentNode.parentNode);
+	        div.select(".title a").style("display", "none");
+	        div.select("#clip-" + id + " rect").attr("x", null).attr("width", "100%");
+	        dimension.filterAll();
+	      }
+	    });
+
+	    chart.margin = function(_){
+	      if (!arguments.length) return margin;
+	      margin = _;
+	      return chart;
+	    };
+
+	    chart.x = function(_){
+	      if (!arguments.length) return x;
+	      x = _;
+	      axis.scale(x);
+	      brush.x(x);
+	      return chart;
+	    };
+
+	    chart.y = function(_){
+	      if (!arguments.length) return y;
+	      y = _;
+	      return chart;
+	    };
+
+	    chart.dimension = function(_){
+	      if (!arguments.length) return dimension;
+	      dimension = _;
+	      return chart;
+	    };
+
+	    chart.filter = function(_){
+	      if (_) {
+	        brush.extent(_);
+	        dimension.filterRange(_);
+	      } else {
+	        brush.clear();
+	        dimension.filterAll();
+	      }
+	      brushDirty = true;
+	      return chart;
+	    };
+
+	    chart.group = function(_){
+	      if (!arguments.length) return group;
+	      group = _;
+	      return chart;
+	    };
+
+	    chart.round = function(_){
+	      if (!arguments.length) return round;
+	      round = _;
+	      return chart;
+	    };
+
+	    return d3.rebind(chart, brush, "on");
+	  }
+  }
+
+  var reviews = <%= entity_types("review").to_json.html_safe %>;
+  demo(reviews);
+
+</script>
+
+<style>
+body {
+  font-size: 13px;
+  color: #111;
+  font-family: Arial,sans-serif;
+  min-height: 2000px;
+}
+
+h1 {
+  font-size: 60px;
+  margin-top: .3em;
+  margin-bottom: 0;
+}
+
+#charts {
+  padding: 10px 0;
+}
+
+.chart {
+  display: inline-block;
+  margin-bottom: 20px;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.reset {
+  padding-left: 1em;
+  font-size: smaller;
+  color: #ccc;
+}
+
+.stop-left {
+  stop-color: #ffce00;
+}
+.stop-right {
+  stop-color: #ffa700;
+}
+
+.background.bar {
+  fill: #ccc;
+}
+
+.foreground.bar {
+	fill: url(#mainGradient); 
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.brush rect.extent {
+  fill: steelblue;
+  fill-opacity: .125;
+}
+
+.brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
+
+#score-chart, #date-chart {
+  
+}
+
+#review-list {
+  min-height: 1024px;
+}
+
+.day {
+	font-weight: 700;
+}
+
+#review-list .date,
+#review-list .day {
+  margin-bottom: .4em;
+}
+
+#review-list .review {
+  line-height: 1.5em;
+  background: #eee;
+  width: 100%;
+  margin-bottom: 1px;
+  padding: 5px;
+}
+
+#review-list .review div {
+  display: inline-block;
+}
+
+#review-list div.productId {
+  color: #999;
+  width: 10%;
+}
+
+#review-list div.summary{
+	width: 10%;
+}
+
+#review-list div.text {
+  width: 79%;
+  text-align: left;
+  padding-right: 1%;
+}
+
+.title{
+	font-size: medium;
+}
+
+#totals {
+  width: 100%;
+  font-size: large;
+  text-align: center;
+  margin-bottom: 20px;
+}
+</style>

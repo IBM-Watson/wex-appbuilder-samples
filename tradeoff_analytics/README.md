@@ -6,7 +6,7 @@ The [IBM Watson Tradeoff Analytics service](http://www.ibm.com/smarterplanet/us/
 
 The goal of this tutorial is to demonstrate how to get started with an integration between Watson Explorer and the Watson Tradeoff Analytics service available on IBM Watson Developer Cloud. By the end of the tutorial you will have a Tradeoff Analytics Bluemix application and a Tradeoff Analytics widget for Watson Explorer that provides visualization and analytical recommendations about books using data indexed by Watson Explorer Engine.
 
-<img src="appbuilder/tradeoff-analytics-widget-screenshot.png" alt="Screen shot of the "Tradeoff Analytic for Books" style="width: 300px;"/>
+![Screen shot of the "Tradeoff Analytic for Books](appbuilder/tradeoff-analytics-widget-screenshot.png)
 
 ## Prerequisites
 Please see the [Introduction](https://github.com/Watson-Explorer/wex-wdc-integration-samples) for an overview of the integration architecture, and the tools and libraries that need to be installed to create Java-based applications in Bluemix.

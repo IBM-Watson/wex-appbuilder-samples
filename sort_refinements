@@ -1,0 +1,73 @@
+ Thanks to Jonathan Ward for this code to sort Refinement Widgets alphabetically.
+
+ 
+
+1. Put the JS in the global JS box in AppBuilder.
+
+2. Change "language_refinement" to your refinement widget ID.
+
+ 
+
+$(document).ready(function() {
+  //select the list items in the refinement
+  var $list = $('section.language_refinement li')
+
+  //create a hash to store the values
+  var hash = {}
+  $list.each(function( index ) {
+    //get the keys and values and sort in a hash
+    $label = $(this).find('.label').text().trim();
+    $link = $(this).find('a').attr('href');
+    $count = $(this).find('.ndocs').text().trim();
+    hash[$label] = [$label,$link,$count]
+  });
+
+  //create a unordered list for the output
+  var ul = $('<ul></ul>');
+
+  //sort the hash alphabetically
+   Object.keys(hash)
+      .sort()
+      .forEach(function(v, i) {
+        //console.log(v, hash[v]);
+         var li = $('<li class="no_children"></li>');
+         li.append('<div role="button" class="toggle_refinement sorted" tabindex="0" aria-label="toggle refinement"></div>');
+         link = $('<a>');
+         link = link.attr('href',hash[v][1]);
+         var div = $('<div class="refinement_information sorted">');
+
+         var newspan1 = $('<span class="label sorted">');
+         //var span = div.append('<span class="label sorted"></span>');
+         newspan1 = newspan1.attr('title',hash[v][0]);
+         newspan1.append(hash[v][0]);
+         div.append(newspan1);
+
+         var newspan2 = $('<span class="ndocs sorted">');
+         newspan2.append(hash[v][2]);
+         div.append(newspan2);
+         link.append(div);
+
+         li.append(link);
+         ul.append(li);
+       });
+  // replace current refinement ul
+  $('section.language_refinement ul').replaceWith(ul);
+
+});
+
+ 
+
+3. Add the CSS component to remove extra space. Put this in the global CSS box.
+
+ 
+
+.sorted {display: inline-block;
+    padding-top: 0em;
+    padding-bottom: 0em;
+}
+
+ 
+
+4. Change your total refinements to show to a number larger than the actual refinements, otherwise the refinements with really low results will not show up, since the code only sorts the refinements that are actually being displayed, not the entire list.
+
+  
